@@ -12,7 +12,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 
 ## Section 2 - Ansible Tower Exercises
 
- - [Configuration Management](configmgmt)
+ - [Exercise - Configuration Management](configmgmt)
 
 ## Additional information
 
