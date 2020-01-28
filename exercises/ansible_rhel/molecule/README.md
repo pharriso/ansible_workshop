@@ -1,4 +1,4 @@
-# Exercise 1.10 - Using Molecule To Test Your Roles
+# Exercise - Using Molecule To Test Your Roles
 
 Molecule is designed to aid in the development and testing of Ansible roles. Molecule provides support for testing with multiple instances, operating systems and distributions, virtualization providers, test frameworks and testing scenarios.
 

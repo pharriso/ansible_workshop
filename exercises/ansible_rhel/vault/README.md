@@ -1,4 +1,4 @@
-# Exercise 1.8 - Working with Ansible Vault
+# Exercise - Working with Ansible Vault
 
 In our previous exercises we have stored variables in plaintext. These variables did not contain sensitive information so that was fine. But what if we want to store things like passwords? We can use Ansible Vault for this use case.
 

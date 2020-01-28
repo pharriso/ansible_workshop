@@ -1,4 +1,4 @@
-# Exercise 1.9 - Using blocks and rescue
+# Exercise - Using blocks and rescue
 
 There may be scenarios where you want to perform error handling if there are problems during a playbook run. Blocks can help us with this common scenario. More details on blocks can be found [here](https://docs.ansible.com/ansible/latest/user_guide/playbooks_blocks.html).
 

@@ -1,4 +1,4 @@
-# Exercise 2.7 - Configuration Management and Drift detection
+# Exercise - Configuration Management and Drift detection
 
 # Configuration Drift
 
