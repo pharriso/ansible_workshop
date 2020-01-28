@@ -13,6 +13,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 ## Section 2 - Ansible Tower Exercises
 
  - [Exercise - Configuration Management](configmgmt)
+ - [Exercise - Using the Tower API](tower-api)
 
 ## Additional information
 
