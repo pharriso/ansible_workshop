@@ -1,14 +1,14 @@
 # Exercise 7 - Tower API
 
-Ansible Tower has a RESTFUL API, which we'll explore a little here. This means that Tower allows us to move away from CLI driven automation with Ansible to API driven automation. An example use case may be to call the Ansible Tower API from a 3rd party system such as ServiceNow or perhaps part of a CI/CD pipeline.
+Ansible Tower has a RESTFUL API, which we'll explore a little here. Tower allows us to move away from CLI driven automation with Ansible to API driven automation. An example use case may be to call the Ansible Tower API from a 3rd party system such as ServiceNow or perhaps part of a CI/CD pipeline.
 
-To explore the API navigate to https://*public_IP*/api/v2/ where *public_IP* is the public IP of your Tower instance.
+To explore the API navigate to https://**public_IP**/api/v2/ where **public_IP** is the public IP of your Tower instance.
 
 ![apiv2](tower-api-v2.png)
 
 ## Calling the API to check status:
 
-Calling the API ping can be a useful 'health' check. https://*public_IP*/api/v2/ping/
+Calling the API ping can be a useful 'health' check. https://**public_IP**/api/v2/ping/
 
 ![ping](tower-api-v2-ping.png)
 
@@ -20,7 +20,7 @@ We'll use the "Install Apache" job template that we created earlier.
 
 ### Find the Job ID
 
-We need to find the job ID so we can launch it via the api. In the Tower UI got to `Templates` and then click on `Install Apache` job template. In the url you will see the job ID. For example - https://X.X.X.X/#/templates/job_template/8 - This shows my job ID is `8`.
+We need to find the job ID so we can launch it via the api. In the Tower UI got to **Templates** and then click on **Install Apache** job template. In the url you will see the job ID. For example - https://X.X.X.X/#/templates/job_template/8 - This shows my job ID is **8**.
 
 
 ### Launch the job
@@ -64,7 +64,7 @@ You should see some output from the job launch including the ID of this particul
 
 ## Checking The Job
 
-From the above output, I can see that `job 58` was created. We can check in the Ansible Tower UI for that job ID to see the output. 
+From the above output, I can see that **job 58** was created. We can check in the Ansible Tower UI for that job ID to see the output. 
 
 ---
 
