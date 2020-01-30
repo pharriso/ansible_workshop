@@ -29,26 +29,26 @@ Create a new playbook called `router_report.yml` and add the following play defi
 
 #### Step 2
 
-Add a task that collects the facts using the `ios_facts` module. Recollect that we used this module in an earlier lab.
+We are going to add some tasks that collect facts. Earlier we used the ios_facts module. We are also going to use the eos_facts module to gather facts from the Arista devices. Note the use of the **when** conditional. Here we are only running specific tasks for ios if the os is ios. 
 
-
+<!-- {% raw %} -->
 ``` yaml
 ---
 - name: GENERATE OS REPORT FROM ROUTERS
-  hosts: cisco
+  hosts: cisco:arista
   connection: network_cli
   gather_facts: no
 
   tasks:
-    - name: GATHER ROUTER FACTS
+    - name: GATHER IOS FACTS
       ios_facts:
+      when: ansible_network_os == 'ios'
 
+    - name: GATHER ARISTA FACTS
+      eos_facts:
+      when: ansible_network_os == 'eos'
 ```
-
-> Recall that the **facts** modules automatically populate the **ansible_net_version** and **ansible_net_serial_number** variables within the play. You can validate this by running the playbook in verbose mode.
-
-
-
+<!-- {% endraw %} -->
 
 #### Step 3
 
@@ -122,19 +122,31 @@ With this in place, go ahead and run the playbook:
 ``` shell
 [student1@ansible networking-workshop]$ ansible-playbook router_report.yml
 
-PLAY [GENERATE OS REPORT FROM ROUTERS] ******************************************************************************************************************************************************
+PLAY [GENERATE OS REPORT FROM ROUTERS] *******************************************************************************************************************************************************
 
-TASK [GATHER ROUTER FACTS] ******************************************************************************************************************************************************************
+TASK [GATHER IOS FACTS] **********************************************************************************************************************************************************************
+skipping: [rtr4]
+skipping: [rtr2]
+
 ok: [rtr1]
 
-TASK [ENSURE REPORTS FOLDER] ********************************************************************************
+TASK [GATHER ARISTA FACTS] *******************************************************************************************************************************************************************
+skipping: [rtr1]
+ok: [rtr4]
+ok: [rtr2]
+
+TASK [ENSURE REPORTS FOLDER] *****************************************************************************************************************************************************************
 changed: [rtr1]
 
-TASK [RENDER FACTS AS A REPORT] *************************************************************************************************************************************************************
+TASK [RENDER FACTS AS A REPORT] **************************************************************************************************************************************************************
+changed: [rtr2]
+changed: [rtr4]
 changed: [rtr1]
 
-PLAY RECAP **********************************************************************************************************************************************************************************
-rtr1                       : ok=2    changed=1    unreachable=0    failed=0   
+PLAY RECAP ***********************************************************************************************************************************************************************************
+rtr1                       : ok=3    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+rtr2                       : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+rtr4                       : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 
 [student1@ansible networking-workshop]$
 
@@ -149,6 +161,8 @@ After the playbook run, you should see the following files appear in the reports
 ``` shell
 reports/
 ├── rtr1.md
+├── rtr2.md
+├── rtr4.md
 
 0 directories, 4 files
 
@@ -184,8 +198,13 @@ While it is nice to have the data, it would be even better to consolidate all th
   gather_facts: no
 
   tasks:
-    - name: GATHER ROUTER FACTS
+    - name: GATHER IOS FACTS
       ios_facts:
+      when: ansible_network_os == 'ios'
+
+    - name: GATHER ARISTA FACTS
+      eos_facts:
+      when: ansible_network_os == 'eos'
 
     - name: ENSURE REPORTS FOLDER
       run_once: true
@@ -213,46 +232,44 @@ Here we are using the `assemble` module. The `src` parameter specifies the direc
 > Note: The **delegate_to** can be used to specify tasks that need to be executed locally. The **run_once** directive will ensure that the given task is executed only once.
 
 
-
-
 #### Step 8
 
 Go ahead and run the playbook.
 
 ``` shell
-[student1@ansible networking-workshop]$ ansible-playbook -i lab_inventory/hosts router_report.yml
+[student1@ansible networking-workshop]$ ansible-playbook router_report.yml
 
-PLAY [GENERATE OS REPORT FROM ROUTERS] **********************************************************************
+PLAY [GENERATE OS REPORT FROM ROUTERS] *******************************************************************************************************************************************************
 
-TASK [GATHER ROUTER FACTS] **********************************************************************************
-ok: [rtr4]
-ok: [rtr3]
+TASK [GATHER IOS FACTS] **********************************************************************************************************************************************************************
+skipping: [rtr4]
+skipping: [rtr2]
 ok: [rtr1]
+
+TASK [GATHER ARISTA FACTS] *******************************************************************************************************************************************************************
+skipping: [rtr1]
+ok: [rtr2]
+ok: [rtr4]
+
+TASK [ENSURE REPORTS FOLDER] *****************************************************************************************************************************************************************
+ok: [rtr1]
+
+TASK [RENDER FACTS AS A REPORT] **************************************************************************************************************************************************************
+ok: [rtr1]
+ok: [rtr4]
 ok: [rtr2]
 
-TASK [ENSURE REPORTS FOLDER] ********************************************************************************
-changed: [rtr1]
-
-TASK [RENDER FACTS AS A REPORT] *****************************************************************************
-changed: [rtr2]
-changed: [rtr1]
-changed: [rtr4]
-changed: [rtr3]
-
-TASK [CONSOLIDATE THE IOS DATA] *****************************************************************************
+TASK [CONSOLIDATE THE IOS DATA] **************************************************************************************************************************************************************
 changed: [rtr1 -> localhost]
 
-PLAY RECAP **************************************************************************************************
-rtr1                       : ok=4    changed=3    unreachable=0    failed=0   
-rtr2                       : ok=2    changed=1    unreachable=0    failed=0   
-rtr3                       : ok=2    changed=1    unreachable=0    failed=0   
-rtr4                       : ok=2    changed=1    unreachable=0    failed=0   
+PLAY RECAP ***********************************************************************************************************************************************************************************
+rtr1                       : ok=4    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+rtr2                       : ok=2    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+rtr4                       : ok=2    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0  
 
 [student1@ansible networking-workshop]$
 
 ```
-
-
 
 #### Step 9
 
@@ -262,28 +279,15 @@ A new file called `network_os_report.md` will now be available in the playbook r
 ``` shell
 [student1@ansible networking-workshop]$ cat network_os_report.md
 
-
 RTR1
 ---
-9YJXS2VD3Q7 : 16.08.01a
-
-
-
+9H1H3T834SJ : 16.09.02
 RTR2
 ---
-9QHUCH0VZI9 : 16.08.01a
-
-
-
-RTR3
----
-9ZGJ5B1DL14 : 16.08.01a
-
-
-
+C43D67850DEFA720A518FA7E3737F3AF : 4.22.1FX-VEOSRouter-cloud
 RTR4
 ---
-9TCM27U9TQG : 16.08.01a
+D71F68C7C77F122B024F7E1D98492466 : 4.22.1FX-VEOSRouter-cloud
 
 [student1@ansible networking-workshop]$
 
@@ -291,7 +295,7 @@ RTR4
 
 > Note: Markdown files can be rendered visually as HTML
 
-At this point, with 3 small tasks, you have an OS report on all the IOS devices in your network. This is a simple example but the principle remains as you expand upon the capabilities.  For example, you can build status reports and dashboards that rely on the output of device show commands.
+At this point, with a few small tasks, you have an OS report on running across different vendor platforms in your network. This is a simple example but the principle remains as you expand upon the capabilities.  For example, you can build status reports and dashboards that rely on the output of device show commands.
 
 Ansible provides the tools and methods to extend network automation beyond configuration management to more robust capabilities, such as, generating documentation and or reports.
 
