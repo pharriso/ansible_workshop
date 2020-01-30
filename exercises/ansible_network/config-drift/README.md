@@ -29,7 +29,7 @@ Click the `+` green button to create a new project.  Fill out the following fiel
 | Parameter | Value |
 |---|---|
 | Name  | Extra Labs Project  |
-| Organization |  Default |
+| Organization | REDHAT NETWORK ORGANIZATION |
 | SCM TYPE |  Git |
 | SCM URL |  https://github.com/pharriso/tower_workshop |
 |SCM UPDATE OPTIONS| [x] Clean <br />  [x] Delete on Update<br />  [x] Update on Launch
@@ -51,7 +51,7 @@ Click on the green `+` button to create a new job template (make sure to select 
 |  Playbook |  snmp_config.yml |
 |  Credential |  Workshop Credential |
 
-Now add the following into EXTRA VARIABLES:
+Now add the following into EXTRA VARIABLES. In reality you would create a custom credential to securely store these details but this is fine for the Lab.
 ```bash
 snow_user: <instructor to provide>
 snow_password: <instructor to provide> 
