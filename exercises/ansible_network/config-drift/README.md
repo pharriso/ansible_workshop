@@ -24,8 +24,6 @@ sudo pip install pysnow
 
 We need to add a new project to gain access to some additional playbooks. Click on the Projects link on the left menu.
 
-![projects link](images/projects.png)
-
 Click the `+` green button to create a new project.  Fill out the following fields.
 
 | Parameter | Value |
@@ -38,13 +36,9 @@ Click the `+` green button to create a new project.  Fill out the following fiel
 
 Click on the Green Save button to save the new project.
 
-![save button](images/save.png)
-
 ## Step 3:
 
 Now we can add a new job template.
-
-![templates link](images/templates.png)
 
 Click on the green `+` button to create a new job template (make sure to select `Job Template` and not `Workflow Template`)
 
