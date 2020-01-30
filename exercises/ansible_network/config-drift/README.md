@@ -20,9 +20,29 @@ To use the ServiceNow module we need to install the pysnow python module. On you
 sudo pip install pysnow 
 ```
 
-## Step 2:
+## Step 2: 
 
-First we Open the web UI and click on the `Templates` link on the left menu.
+We need to add a new project to gain access to some additional playbooks. Click on the Projects link on the left menu.
+
+![projects link](images/projects.png)
+
+Click the `+` green button to create a new project.  Fill out the following fields.
+
+| Parameter | Value |
+|---|---|
+| Name  | Workshop Project  |
+| Organization |  Default |
+| SCM TYPE |  Git |
+| SCM URL |  https://github.com/pharriso/tower_workshop |
+|SCM UPDATE OPTIONS| [x] Clean <br />  [x] Delete on Update<br />  [x] Update on Launch
+
+Click on the Green Save button to save the new project.
+
+![save button](images/save.png)
+
+## Step 3:
+
+Now we can add a new job template.
 
 ![templates link](images/templates.png)
 
@@ -34,7 +54,7 @@ Click on the green `+` button to create a new job template (make sure to select 
 |  Job Type |  Run |
 |  Inventory |  Workshop Inventory |
 |  Project |  Workshop Project |
-|  Playbook |  router_config.yml |
+|  Playbook |  snmp_config.yml |
 |  Credential |  Workshop Credential |
 
 Now add the following into EXTRA VARIABLES:
@@ -46,26 +66,25 @@ snow_instance: <instructor to provide>
 
 Scroll down and click the green `save` button.
 
-
-## Step 3
-
-Now let's launch the job template. We shouldn't see any changes being made during the job run and as a result we don't need to raise an incident in ServiceNow.
-
 ## Step 4
 
-Let's log onto one of our routers and make a change outside of the control of our automation. 
+Let's launch the job template. We shouldn't see any changes being made during the job run and as a result we don't need to raise an incident in ServiceNow.
+
+## Step 5
+
+Log onto one of our routers and make a change outside of the control of our automation. 
 
 ```bash
 ssh rtr1
 rtr1#conf t
-rtr1(config)#ip ssh time-out 120
+rtr1(config)#no snmp-server community ansible-public RO
 ```
 
 Now execute our **ROUTER CONFIG** job again. This time we should see some changes being made and a ServiceNow incident should be raised. The incident number is reported as part of the job output as well.
 
 ![job_link](images/snow_output.png)
 
-## Step 5
+## Step 6
 
 Log into ServiceNow - https://<< instance name >>.service-now.com. Use the same credentials you passed into your job template as variables.
 
