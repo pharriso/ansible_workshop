@@ -64,8 +64,13 @@ Rather than using debug or verbose mode to display the output on the screen, go 
   gather_facts: no
 
   tasks:
-    - name: GATHER ROUTER FACTS
+    - name: GATHER IOS FACTS
       ios_facts:
+      when: ansible_network_os == 'ios'
+
+    - name: GATHER ARISTA FACTS
+      eos_facts:
+      when: ansible_network_os == 'eos'
 
     - name: ENSURE REPORTS FOLDER
       run_once: true
