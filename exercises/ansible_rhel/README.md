@@ -7,6 +7,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 ## Section 1 - Additional Ansible Engine Exercises
 
  - [Exercise - Ansible Vault](vault)
+ - [Exercise - Blocks and Rescue](blocks)
  - [Exercise - Molecule - Testing roles](molecule)
 
 ## Section 2 - Ansible Tower Exercises
