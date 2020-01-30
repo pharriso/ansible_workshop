@@ -44,7 +44,7 @@ Click on the green `+` button to create a new job template (make sure to select 
 
 | Parameter | Value |
 |---|---|
-| Name  | SNMP CONFIG  |
+| Name  | Network-SNMP  |
 |  Job Type |  Run |
 |  Inventory |  Workshop Inventory |
 |  Project |  Extra Labs Project |
