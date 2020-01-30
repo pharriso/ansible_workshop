@@ -12,6 +12,9 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 
 ## Section 2 - Ansible Tower Exercises
 
+ - [Exercise - Config Drift and ServiceNow integration ](config-drift)
+ - [Exercise - More Worfklows with testing ](more-workflows)
+
 ## Additional information
 
  - [Ansible Getting Started](http://docs.ansible.com/ansible/latest/intro_getting_started.html)
