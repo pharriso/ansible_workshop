@@ -47,14 +47,6 @@ rtr1#
 ```
 #### Step 2
 
-We are going to use the net_put Ansible module to copy the config backup to the routers. This requires the scp python module. We need to install that first:
-
-```
-sudo pip install scp
-```
-
-#### Step 3
-
 Step 1 simulates our "Out of process/band" changes on the network. This change needs to be reverted. So let's write a new playbook to apply the backup we collected from our previous lab to achieve this.
 
 Create a file called `restore_config.yml` using your favorite text editor and add the following play definition:
@@ -69,8 +61,6 @@ Create a file called `restore_config.yml` using your favorite text editor and ad
 ```
 
 
-#### Step 4
-
 Write the task to copy over the previously backed up configuration file to the routers.
 
 <!-- {% raw %} -->
@@ -83,38 +73,32 @@ Write the task to copy over the previously backed up configuration file to the r
 
   tasks:
     - name: COPY RUNNING CONFIG TO ROUTER
-      net_put: 
-        src: ./backup/{{inventory_hostname}}.config
-        dest: flash:/{{inventory_hostname}}.config
-      vars:
-        ansible_command_timeout: 120
+      command: scp ./backup/{{inventory_hostname}}.config {{inventory_hostname}}:/{{inventory_hostname}}.config
 
+    - name: CONFIG REPLACE
+      ios_command:
+        commands:
+          - config replace flash:{{inventory_hostname}}.config force
 ```
 <!-- {% endraw %} -->
 
 > Note the use of the **inventory_hostname** variable. For each device in the inventory file under the cisco group, this task will secure copy (scp) over the file that corresponds to the device name onto the bootflash: of the CSR devices.
 
 
-#### Step 5
+#### Step 3
 
 Go ahead and run the playbook.
 
 ```
-[student1@ansible networking-workshop]$ ansible-playbook -i lab_inventory/hosts restore_config.yml
+[student1@ansible networking-workshop]$ ansible-playbook restore_config.yml
 
 PLAY [RESTORE CONFIGURATION] *********************************************************
 
 TASK [COPY RUNNING CONFIG TO ROUTER] *************************************************
 changed: [rtr1]
-changed: [rtr2]
-changed: [rtr3]
-changed: [rtr4]
 
 PLAY RECAP ***************************************************************************
 rtr1                       : ok=1    changed=1    unreachable=0    failed=0   
-rtr2                       : ok=1    changed=1    unreachable=0    failed=0   
-rtr3                       : ok=1    changed=1    unreachable=0    failed=0   
-rtr4                       : ok=1    changed=1    unreachable=0    failed=0   
 
 [student1@ansible networking-workshop]$
 
@@ -123,7 +107,7 @@ rtr4                       : ok=1    changed=1    unreachable=0    failed=0
 ```
 
 
-#### Step 6
+#### Step 4
 
 Log into the routers to check that the file has been copied over
 
@@ -168,7 +152,7 @@ rtr1#
 
 
 
-#### Step 7
+#### Step 5
 
 Now that the known good configuration is on the destination devices, add a new task to the playbook to replace the running configuration with the one we copied over.
 
@@ -194,7 +178,6 @@ Now that the known good configuration is on the destination devices, add a new t
       ios_command:
         commands:
           - config replace flash:{{inventory_hostname}}.config force
-
 ```
 <!-- {% endraw %} -->
 
@@ -202,41 +185,20 @@ Now that the known good configuration is on the destination devices, add a new t
 > Note: Here we take advantage of Cisco's **archive** feature. The config replace will only update the differences to the router and not really a full config replace.
 
 
-#### Step 8
+#### Step 6
 
 Let's run the updated playbook:
 
 ```
 
-[student1@ansible networking-workshop]$ ansible-playbook -i lab_inventory/hosts restore_config.yml -v
+[student1@ansible networking-workshop]$ ansible-playbook restore_config.yml -v
 
 PLAY [RESTORE CONFIGURATION] *********************************************************
 
 TASK [COPY RUNNING CONFIG TO ROUTER] *************************************************
 changed: [rtr1]
-changed: [rtr3]
-changed: [rtr2]
-changed: [rtr4]
 
 TASK [CONFIG REPLACE] ****************************************************************
-ok: [rtr2] => changed=false 
-  stdout:
-  - |-
-    Total number of passes: 0
-    Rollback Done
-  stdout_lines: <omitted>
-ok: [rtr4] => changed=false 
-  stdout:
-  - |-
-    Total number of passes: 0
-    Rollback Done
-  stdout_lines: <omitted>
-ok: [rtr3] => changed=false 
-  stdout:
-  - |-
-    Total number of passes: 0
-    Rollback Done
-  stdout_lines: <omitted>
 ok: [rtr1] => changed=false 
   stdout:
   - |-
@@ -246,9 +208,6 @@ ok: [rtr1] => changed=false
 
 PLAY RECAP ***************************************************************************
 rtr1                       : ok=2    changed=1    unreachable=0    failed=0   
-rtr2                       : ok=2    changed=1    unreachable=0    failed=0   
-rtr3                       : ok=2    changed=1    unreachable=0    failed=0   
-rtr4                       : ok=2    changed=1    unreachable=0    failed=0   
 
 [student1@ansible networking-workshop]$
 
@@ -256,7 +215,7 @@ rtr4                       : ok=2    changed=1    unreachable=0    failed=0
 ```
 
 
-#### Step 9
+#### Step 7
 
 
 
@@ -287,10 +246,6 @@ rtr1#
 ```
 
 The output above shows that the Loopback 101 interface is no longer present, you have successfully backed up and restored configurations on your Cisco routers!
-
-# Complete
-
-You have completed lab exercise 2.2
 
 ---
 [Click Here to return to the Ansible Linklight - Networking Workshop](../../README.md)
