@@ -7,6 +7,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 ## Section 1 - Additional Ansible Engine Exercises
 
  - [Exercise - Backup router configs](backup)
+ - [Exercise - Restore router configs](restore)
 
 ## Section 2 - Ansible Tower Exercises
 
