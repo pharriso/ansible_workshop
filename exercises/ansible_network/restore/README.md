@@ -168,11 +168,7 @@ Now that the known good configuration is on the destination devices, add a new t
 
   tasks:
     - name: COPY RUNNING CONFIG TO ROUTER
-      net_put: 
-        src: ./backup/{{inventory_hostname}}.config
-        dest: flash:/{{inventory_hostname}}.config
-      vars:
-        ansible_command_timeout: 120
+      command: scp ./backup/{{inventory_hostname}}.config {{inventory_hostname}}:/{{inventory_hostname}}.config
 
     - name: CONFIG REPLACE
       ios_command:
