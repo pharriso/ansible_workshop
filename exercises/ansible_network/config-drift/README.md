@@ -30,7 +30,7 @@ Click the `+` green button to create a new project.  Fill out the following fiel
 
 | Parameter | Value |
 |---|---|
-| Name  | Workshop Project  |
+| Name  | Extra Labs Project  |
 | Organization |  Default |
 | SCM TYPE |  Git |
 | SCM URL |  https://github.com/pharriso/tower_workshop |
@@ -50,10 +50,10 @@ Click on the green `+` button to create a new job template (make sure to select 
 
 | Parameter | Value |
 |---|---|
-| Name  | ROUTER CONFIG  |
+| Name  | SNMP CONFIG  |
 |  Job Type |  Run |
 |  Inventory |  Workshop Inventory |
-|  Project |  Workshop Project |
+|  Project |  Extra Labs Project |
 |  Playbook |  snmp_config.yml |
 |  Credential |  Workshop Credential |
 
