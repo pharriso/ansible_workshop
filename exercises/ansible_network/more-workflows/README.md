@@ -24,6 +24,8 @@ curl -O https://raw.githubusercontent.com/pharriso/tower_workshop/master/files/w
 
 ## Step 2:
 
+Edit the tower_workflow.yml playbook using your prefered editor and set the **tower_password** var so it contains the correct admin password for your Tower instance. 
+
 Now run the playbook to create the necessary job templates and workflow in Tower.
 
 ```bash
