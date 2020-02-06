@@ -14,6 +14,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 
  - [Exercise - Configuration Management](configmgmt)
  - [Exercise - Using the Tower API](tower-api)
+ - [Exercise - Using an external secret vault](tower-secret)
 
 ## Additional information
 
