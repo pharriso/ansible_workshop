@@ -1,4 +1,4 @@
-# Exercise 7 - Tower API
+# Exercise - Tower API
 
 Ansible Tower has a RESTFUL API, which we'll explore a little here. Tower allows us to move away from CLI driven automation with Ansible to API driven automation. An example use case may be to call the Ansible Tower API from a 3rd party system such as ServiceNow or perhaps part of a CI/CD pipeline.
 
