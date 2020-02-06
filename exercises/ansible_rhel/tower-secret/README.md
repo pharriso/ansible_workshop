@@ -1,8 +1,10 @@
-# Exercise - Tower External Secret Mananement
+# Exercise - Tower External Secret Management
 
 Tower has it's own built in secret management which we have used to store credentials. But, we can also integrate Tower with external secret management systems - namely Hashicorp Vault, CyberArk and Azure Key Manager.
 
 In this lab we will use Azure Key Manager to show this integration.
+
+Here is a link to the Ansible documentation on [Secret Management](https://docs.ansible.com/ansible-tower/latest/html/userguide/credential_plugins.html)
 
 
 ## Create user account on node1
