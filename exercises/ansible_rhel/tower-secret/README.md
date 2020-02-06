@@ -52,7 +52,7 @@ Click the green **+** button to add a new credential:
 
   - Click **TEST**
 
-  - For the **Secret Name** Enter password. You should see a message appear in the top right corner saying **Test Passed**.
+  - For the **Secret Name** Enter **password**. You should see a message appear in the top right corner saying **Test Passed**.
 
   - Click **Close** to close the Test dialog box.
 
@@ -66,7 +66,7 @@ In the **RESOURCES** menu choose **Credentials**. Now:
 
 Click the green **+** button to add a new credential:
     
-  - **NAME:** Vault Machine Credential 
+  - **NAME:** azure-user
 
   - **ORGANIZATION:** Default
 
@@ -74,7 +74,7 @@ Click the green **+** button to add a new credential:
 
   - **USERNAME:** azure-user
 
-  - **PASSWORD:** Press the magnifying glass in the password box. You should see **azure vault** in the list. Select **azure vault** and then click on the **METADAT** button. In the **SECRET NAME** enter **password**
+  - **PASSWORD:** Press the magnifying glass in the password box. You should see **azure vault** in the list. Select **azure vault** and then click on the **METADA** button. In the **SECRET NAME** enter **password**
 
   - Click **OK**
 
@@ -84,7 +84,7 @@ Click the green **+** button to add a new credential:
 
 To test the integration we will run an ad-hoc job against node1. In the Tower UI navigate to **Inventories**, **Workshop Inventory** and then click the **Hosts** button. Select **node1** from the list and then press the **Run commands** button.
 
-For the module select **setup**. For the Machine Credential use **Vault Machine Credential**. Press **Launch**
+For the module select **setup**. For the Machine Credential use **azure-user**. Press **Launch**
 
 Tower will now go to Azure Vault to retrieve the relevant secret and you should see a succesful job completion. 
 
