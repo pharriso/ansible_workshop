@@ -1,0 +1,72 @@
+---
+
+- hosts: all
+  become: yes
+  tasks:
+  - name: stop tower
+    shell: ansible-tower-service stop
+
+  - name: install cockpit
+    yum:
+      name: cockpit
+      state: latest
+
+  - name: allow cockpit to listen on 443
+    seport:
+      ports: 443
+      proto: tcp
+      setype: websm_port_t
+      state: present
+
+  - name: start and enable cockpit
+    service:
+      name: cockpit.socket
+      state: started
+      enabled: yes
+
+  - name: create directory for socket modification
+    file:
+      state: directory
+      path: /etc/systemd/system/cockpit.socket.d/
+
+  - name: create custom socket file
+    blockinfile:
+      path: /etc/systemd/system/cockpit.socket.d/listen.conf
+      block: |
+        [Socket]
+        ListenStream=443
+      create: true
+    notify: 
+     - restart cockpit
+     - systemd reload
+
+  - name: remove self-signed cockpit certificate
+    file:
+      state: absent
+      path: /etc/cockpit/ws-certs.d/0-self-signed.cert
+    
+  - name: copy letsencrypt certificates to cockpit directory
+    copy:
+      src: "{{ item }}"
+      dest: /etc/cockpit/ws-certs.d/
+      remote_src: true
+    loop: 
+      - /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+      - /etc/letsencrypt/live/{{ inventory_hostname }}/privkey.pem
+
+  - name: assemble cockpit certificate
+    assemble:
+      src: /etc/cockpit/ws-certs.d
+      dest: /etc/cockpit/ws-certs.d/cockpit.cert
+      regexp: 'pem$'
+    notify: restart cockpit
+
+  handlers:
+  - name: systemd reload
+    systemd:
+      daemon_reload: yes
+
+  - name: restart cockpit
+    service:
+      name: cockpit.socket
+      state: restarted
