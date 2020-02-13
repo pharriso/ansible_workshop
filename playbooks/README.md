@@ -1,10 +1,10 @@
 workshop_cockpit
 ========
-This playbook can setup a cockpit server on one of the student workstations. This is useful to allow users to access the cockpit web terminal for ssh access to their lab environment. Pick a free lab environment as this playbook will stop Tower and configure cockpit on port 443.
+This playbook can setup a cockpit server on one of the student workstations. This is useful to allow users access to the cockpit web terminal for ssh access to their lab environment. Pick a free lab environment as this playbook will stop Tower and configure cockpit on port 443.
 
 To run the playbook (note you need the comma after server name):
 
-ansible-playbook -i <student>.<domain>, workshop_cockpit.yml -u <student> -k
+ansible-playbook -i student.domain, workshop_cockpit.yml -u student -k
 
 e.g.
 
