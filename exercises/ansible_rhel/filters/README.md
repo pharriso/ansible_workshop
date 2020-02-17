@@ -319,6 +319,8 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
+These are simple but effective examples you can use in your playbooks and roles, to make them a little more bullet and silly proof!
+
 ---
 
 [Click Here to return to the Ansible Linklight - Ansible Engine Workshop](../README.md)
