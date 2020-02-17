@@ -1,7 +1,6 @@
 # Exercise - Working with Ansible Filters
 
-
-Ansible comes with many filters which allow you to transform data.
+Ansible comes with many [filters](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html) which allow you to transform data.
 
 Let's go through a couple of common use case examples to showcase their power.
 
