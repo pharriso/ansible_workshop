@@ -194,9 +194,47 @@ EOF
 
 We're now checking that MY_USER isn't set to root and that the password var set is sensible (perhaps to met minimum security standards)
 
-As we left $MY_USER set to 'root', if you run the playbook it should now fail. As the password variable also doesn't met our complexity, that will also fail:
+As we left $MY_USER set to 'root', if you run the playbook it should now fail:
 
 ```bash
+ansible-playbook defaults_sample.yml
+[WARNING]: No inventory was parsed, only implicit localhost is available
+[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+
+PLAY [localhost] ***************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************
+ok: [localhost]
+
+TASK [set_fact] ****************************************************************************************************************
+ok: [localhost]
+
+TASK [debug] *******************************************************************************************************************
+ok: [localhost] => {
+    "msg": "myuser is now set to ROOT"
+}
+
+TASK [User check validation] ***************************************************************************************************
+fatal: [localhost]: FAILED! => {
+    "assertion": "myuser != \"root\"",
+    "changed": false,
+    "evaluated_to": false,
+    "msg": [
+        "You appear to be root",
+        "I'm not going to allow that!"
+    ]
+}
+
+PLAY RECAP *********************************************************************************************************************
+localhost                  : ok=3    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+```
+
+Bingo! We've caught which could be a silly and far reaching issue. The [assert](https://docs.ansible.com/ansible/latest/modules/assert_module.html) module is a nice and simple way to make some simple assumptions and checks. 
+
+Set $MY_USER back to something other than root and re-run the playbook:
+
+```bash
+export MY_USER=fred
 ansible-playbook defaults_sample.yml
 ```
 
