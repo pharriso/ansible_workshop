@@ -236,6 +236,87 @@ Set $MY_USER back to something other than root and re-run the playbook:
 ```bash
 export MY_USER=fred
 ansible-playbook defaults_sample.yml
+[WARNING]: No inventory was parsed, only implicit localhost is available
+[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+
+PLAY [localhost] ***************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************
+ok: [localhost]
+
+TASK [set_fact] ****************************************************************************************************************
+ok: [localhost]
+
+TASK [debug] *******************************************************************************************************************
+ok: [localhost] => {
+    "msg": "myuser is now set to FRED"
+}
+
+TASK [User check validation] ***************************************************************************************************
+ok: [localhost] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Check password complexity] ***********************************************************************************************
+fatal: [localhost]: FAILED! => {
+    "assertion": "password | length > 7",
+    "changed": false,
+    "evaluated_to": false,
+    "msg": "password does not need password complexity requirements (8+ Chars, Lower Case, Upper Case, Number)"
+}
+
+PLAY RECAP *********************************************************************************************************************
+localhost                  : ok=4    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+```
+
+You'll see that we've now passed the root check, but failed the password one!
+
+We've done a variable length and several regex_search checks, to ensure that the password has 8 or more characters, and at least one lower and upper case character and a number.
+
+Now edit the playbook, and change the password variable to something that will pass the checks. Maybe something like this:
+
+```bash
+
+  vars:
+    password: Redhat123
+    
+```
+
+Re-run the playbook, and you should now pass all validations:
+
+```bash
+ansible-playbook defaults_sample.yml
+[WARNING]: No inventory was parsed, only implicit localhost is available
+[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+
+PLAY [localhost] ***************************************************************************************************************
+
+TASK [Gathering Facts] *********************************************************************************************************
+ok: [localhost]
+
+TASK [set_fact] ****************************************************************************************************************
+ok: [localhost]
+
+TASK [debug] *******************************************************************************************************************
+ok: [localhost] => {
+    "msg": "myuser is now set to FRED"
+}
+
+TASK [User check validation] ***************************************************************************************************
+ok: [localhost] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+TASK [Check password complexity] ***********************************************************************************************
+ok: [localhost] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+PLAY RECAP *********************************************************************************************************************
+localhost                  : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 ---
