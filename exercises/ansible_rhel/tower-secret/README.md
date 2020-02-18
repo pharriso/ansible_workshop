@@ -76,7 +76,7 @@ Click the green **+** button to add a new credential:
 
   - **USERNAME:** azure-user
 
-  - **PASSWORD:** Press the magnifying glass in the password box. You should see **azure vault** in the list. Select **azure vault** and then click on the **METADA** button. In the **SECRET NAME** enter **password**
+  - **PASSWORD:** Press the magnifying glass in the password box. You should see **azure vault** in the list. Select **azure vault** and then click on the **METADATA** button. In the **SECRET NAME** enter **password**
 
   - Click **OK**
 
@@ -225,6 +225,77 @@ localhost                  : ok=4    changed=1    unreachable=0    failed=0    s
 
 You can see we've created a key-value 'kv' secret with the details you supplied, using the hashivault_write module.
 We then use the hashivault_read module to show us what's been added. So we have **username** and **password** pairs stored.
+
+## Create a Hashicorp Vault Credential in Tower
+
+In the Tower UI, create a credential that will allow Tower to query the Hashicorp Vault.
+
+In the **RESOURCES** menu choose **Credentials**. Now:
+
+Click the green **+** button to add a new credential:
+    
+  - **NAME:** Hashicorp Vault
+
+  - **ORGANIZATION:** Default
+
+  - **CREDENTIAL TYPE:** Click on the magnifying glass, pick **HashiCorp Vault Secret Lookup** 
+
+  - **Server URL:** http://localhost:8000
+
+  - **Token:** your_rootKey
+
+  - Click **TEST**
+
+  - Leave **Name of Secret Backend** blank
+  - **Path to Secret:** /kv/studentX
+  - **Key Name:** password
+  
+  - Click **RUN**
+  
+  You should see a message appear in the top right corner saying **Lookup: Test passed**.
+
+  - Click **Close** to close the Test dialog box.
+
+  - Click **Save**
+
+## Create a credential that will use a secret from Hashicorp Vault
+
+In the Tower UI, create a credential that will use the secret we've created in Hashicorp Vault.
+
+In the **RESOURCES** menu choose **Credentials**. Now:
+
+Click the green **+** button to add a new credential:
+    
+  - **NAME:** hashivault-user
+
+  - **ORGANIZATION:** Default
+
+  - **CREDENTIAL TYPE:** Click on the magnifying glass, pick **Machine** 
+
+  - **USERNAME:** studentX
+
+  - **PASSWORD:** Press the magnifying glass in the password box. You should see **Hashicorp Vault** in the list. Select **azure vault** and then click on the **NEXT**. 
+  
+  In the **PATH TO SECRET** enter **/kv/studentX**
+  In the **KEY NAME** enter **password**
+
+  - Click **TEST**
+  
+  You should see a message appear in the top right corner saying **Lookup: Test passed**.
+  
+  - Click **OK**
+
+  - Click **SAVE**
+
+## Test the Integration
+
+To test the integration we will run an ad-hoc job against node1. In the Tower UI navigate to **Inventories**, **Workshop Inventory** and then click the **Hosts** button. Select **node1** from the list and then press the **Run commands** button.
+
+For the module select **setup**. For the Machine Credential select **hashivault-user**. Press **Launch**
+
+Tower will now go to Hashicorp Vault to retrieve the relevant password and you should see a succesful job completion.
+
+You have now integrated Hashicorp Vault Secrets Engine with Ansible Tower :)
 
 ---
 
