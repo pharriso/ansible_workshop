@@ -6,16 +6,16 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 
 ## Section 1 - Additional Ansible Engine Exercises
 
- - [Exercise - Ansible Vault](vault)
- - [Exercise - Blocks and Rescue](blocks)
- - [Exercise - Ansible Filters](filters)
- - [Exercise - Molecule - Testing roles](molecule)
+ - [Exercise - Ansible Vault: encrypting sensitive data](vault)
+ - [Exercise - Blocks and Rescue: help! rollback, rollback! ](blocks)
+ - [Exercise - Ansible Filters: parsing/transforming/checking](filters)
+ - [Exercise - Molecule: a roles testing framework](molecule)
 
 ## Section 2 - Ansible Tower Exercises
 
- - [Exercise - Configuration Management](configmgmt)
- - [Exercise - Using the Tower API](tower-api)
- - [Exercise - Using an external secret vault](tower-secret)
+ - [Exercise - Configuration Management: config drift logged with ServiceNow](configmgmt)
+ - [Exercise - Exploring the Tower API](tower-api)
+ - [Exercise - Using External Vault Integrations: Azure Key Manager and Hashicorp Vault](tower-secret)
 
 ## Additional information
 
