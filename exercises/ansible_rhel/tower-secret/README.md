@@ -1,11 +1,13 @@
 # Exercise - Tower External Secret Management
 
-Tower has it's own built in secret management which we have used to store credentials. But, we can also integrate Tower with external secret management systems - namely Hashicorp Vault, CyberArk and Azure Key Manager.
+Tower has it's own built in secret management which we have used to store credentials. But, we can also integrate Tower with external secret management systems like Hashicorp Vault, CyberArk and Azure Key Manager.
 
-In this lab we will use Azure Key Manager to show this integration.
+This exercise presents 2 examples of such integrations: Azure Key Manager and Hashicorp Vault.
 
 Here is a link to the Ansible documentation on [Secret Management](https://docs.ansible.com/ansible-tower/latest/html/userguide/credential_plugins.html)
 
+
+# Azure Key Manager
 
 ## Create user account on node1
 
@@ -97,6 +99,132 @@ ansible node1 -m user -a "name=azure-user password={{ 'IBM123' | password_hash('
 ```
 
 Now re-launch the ad-hoc job against node1 (navigate to **Jobs** and hit the launch icon next to the setup job you just ran). You should see a failed login attempt.
+
+
+# Hashicorp Vault
+
+## Install Hashicorp Vault
+
+We'll install Vault on your Ansible **control** node. 
+
+Login to your student control node and run this to install and base configure the Vault:
+
+```bash
+cd && git clone https://github.com/ffirg/HashiVaultRole && cd HashiVaultRole
+ansible-playbook hashivault.yml
+```
+
+It should now be running on the control node using HTTP port 8000. We can check using:
+
+```bash
+ss -nlp | grep 8000         [ check we're up and listening on port 8000 ]
+curl localhost:8000/ui/     [check the UI, which we also install for convenience]
+systemctl status vault      [ check our newly created systemd vault sercice is running]
+```
+
+## Adding a Secret
+
+We can use the secrets.yml playbook also in this repo to add some credentials. But first we must authenticate with Vault.
+
+```bash
+export VAULT_ADDR="http://localhost:8000"
+```
+
+This sets where vault is. We can now login using a token. When we installed the system a **rootKey** was generated. We'll use that.
+
+```bash
+awk -F[ '{print $1}' rootKey/rootkey
+s.83I8gWop4i79dFWWoiu3YuqC [yours will be different!]
+```
+
+Login using the above key:
+
+```bash
+vault login
+Token (will be hidden):
+Success! You are now authenticated. The token information displayed below
+is already stored in the token helper. You do NOT need to run "vault login"
+again. Future Vault requests will automatically use this token.
+Key                  Value
+---                  -----
+token                s.83I8gWop4i79dFWWoiu3YuqC
+token_accessor       cRlwkLm3UmiSwShvSsW9pJnE
+token_duration       ∞
+token_renewable      falsec
+token_policies       ["root"]
+identity_policies    []
+```
+
+tip: if you ever need to know what your token is again, you can also use this:
+vault token lookup | grep '^id' | awk '{print $2}'
+
+Before we can run our next playbook, we need to install some helpful modules:
+
+```bash
+sudo pip install ansible-modules-hashivault
+```
+
+We can now add some credentials. Run the following **verbose** playbook, supplying **your** assigned student/password details:
+
+```bash
+ansible-playbook secrets.yml -v
+Using /home/student1/.ansible.cfg as config file
+Enter your student number : student1
+Enter your student password : redhat
+
+PLAY [localhost] **********************************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************
+ok: [localhost]
+
+TASK [hashivault_status] **************************************************************************************************
+ok: [localhost] => changed=false
+  rc: 0
+  status:
+    cluster_id: 5ab41459-68ea-7a58-a0f6-a8a3007f2ec5
+    cluster_name: vault-cluster-be3d8d1f
+    initialized: true
+    migration: false
+    n: 5
+    nonce: ''
+    progress: 0
+    recovery_seal: false
+    sealed: false
+    storage_type: file
+    t: 3
+    type: shamir
+    version: 1.3.2
+
+TASK [hashivault_write] ***************************************************************************************************
+changed: [localhost] => changed=true
+  msg: Secret kv/******** written
+  rc: 0
+
+TASK [hashivault_read] ****************************************************************************************************
+ok: [localhost] => (item=username) => changed=false
+  ansible_loop_var: item
+  item: username
+  lease_duration: 2764800
+  lease_id: ''
+  rc: 0
+  renewable: false
+  value: student1
+ok: [localhost] => (item=password) => changed=false
+  ansible_loop_var: item
+  item: password
+  lease_duration: 2764800
+  lease_id: ''
+  rc: 0
+  renewable: false
+  value: Redhat123
+
+PLAY RECAP ****************************************************************************************************************
+localhost                  : ok=4    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+```
+
+You can see we've created a key-value 'kv' secret with the details you supplied, using the hashivault_write module.
+We then use the hashivault_read module to show us what's been added. So we have **username** and **password** pairs stored.
 
 ---
 
