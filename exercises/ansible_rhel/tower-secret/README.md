@@ -274,7 +274,7 @@ Click the green **+** button to add a new credential:
 
   - **USERNAME:** studentX
 
-  - **PASSWORD:** Press the magnifying glass in the password box. You should see **Hashicorp Vault** in the list. Select **azure vault** and then click on the **NEXT**. 
+  - **PASSWORD:** Press the magnifying glass in the password box. You should see **Hashicorp Vault** in the list. Select **Hashicorp Vault** and then click on the **NEXT**. 
   
   In the **PATH TO SECRET** enter **/kv/studentX**
   In the **KEY NAME** enter **password**
