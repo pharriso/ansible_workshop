@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  connection: local
+
+  collections:
+   - ansible.builtin
+   - myns.mycollection
+   - otherns.othercollection
+
+  tasks:
+
+  - ping: # first found in the list of collections
+  #- otherns.othercollection.mymodule: # fully-qualified is also fine
