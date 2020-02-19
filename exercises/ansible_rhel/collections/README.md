@@ -35,7 +35,9 @@ cat >collection_example.yml <<EOF
 EOF
 ```
 
-Hold your horses! Before running it, let's first explain what we have here :)
+## Hold your horses!
+
+Before running it, let's first explain what we have here :)
 
 Collections 'live' in a namespace, have a name, and then contain content, like modules within them. So it's like this:
 my_namespace.my_collection.my_module
@@ -43,7 +45,9 @@ my_namespace.my_collection.my_module
 In our example, 'ansible' is the namespace, the collections are 'builtin' and 'legacy' and the module is 'ping'
 
 Other examples might be something like:
-f5.bigip.provisioning_role (made up), or, azure.azcollection, google.cloud (real ones!)
+f5.bigip.provisioning_role (made up), or,
+azure.azcollection
+google.cloud (real ones!)
 
 Now run the playbook passing in a **which_ping** variable (using -e extra_vars) to see what gets called:
 
@@ -80,25 +84,13 @@ cat >collection_terse.yml <<EOF
 EOF
 ```
 
-Run it of you like:
+Run it of you like :)
 
 ```bash
 ansible-playbook collection_terse.yml
-[WARNING]: No inventory was parsed, only implicit localhost is available
-[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match
-'all'
-
-PLAY [localhost] **********************************************************************************************************
-
-TASK [Gathering Facts] ****************************************************************************************************
-ok: [localhost]
-
-TASK [ping] ***************************************************************************************************************
-ok: [localhost]
-
-PLAY RECAP ****************************************************************************************************************
-localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
+
+Using paths, should cut down on typing!
 
 ---
 
