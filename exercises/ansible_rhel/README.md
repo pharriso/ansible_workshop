@@ -9,6 +9,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
  - [Exercise - Ansible Vault: encrypting sensitive data](vault)
  - [Exercise - Blocks and Rescue: help! rollback, rollback! ](blocks)
  - [Exercise - Ansible Filters: parsing/transforming/checking](filters)
+ - [Exercise - Ansible Collections: using collections in a playbook](collections)
  - [Exercise - Molecule: a roles testing framework (uses docker)](molecule)
 
 ## Section 2 - Ansible Tower Exercises
