@@ -10,7 +10,7 @@ If you want to learn more about developing collections then go [here](https://do
 
 ## Just Ping It
 
-Using the ping module we can quickly demonstrate how collections are called/used with a playbook.
+Using the simple **ping** module we can quickly demonstrate how collections are used within a playbook.
 
 Create this simple playbook, by running:
 
@@ -39,13 +39,23 @@ Hold your horses! Before running it, let's first explain what we have here :)
 
 TBA...
 
-Now run the playbook passing in a which_ping variable (using -e extra_vars) to see what get's called:
+Now run the playbook passing in a **which_ping** variable (using -e extra_vars) to see what gets called:
 
 ```bash
 ansible-playbook collection_example.yml -e which_ping="builtin"
 ansible-playbook collection_example.yml -e which_ping="legacy"
 ansible-playbook collection_example.yml -e which_ping="somethingelse"
 ```
+
+You'll see the appropriate ping module gets called when the condition is true, and that all work.
+
+As with everything Ansible, order is important. The first found will get used, as we run sequentially through the playbook.
+
+
+## Less Typing Please!
+
+TBA
+
 
 ---
 
