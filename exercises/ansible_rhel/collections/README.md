@@ -10,7 +10,9 @@ There are different ways to interact with Ansible Collections:
 
 Regardless of the method chosen, first you need to find, identity and obtain the Ansible Collections you want to use.
 
-Ansible when installed, will come with some **core** collection content. This quick exercise will show you how to use that in your playbooks/roles, as a quick example.
+Ansible when installed, will come with some **core** collection content. 
+
+This exercise will show you how to use that in your playbooks/roles, as a quick example.
 
 If you want to learn more about developing collections then go [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html)
 
