@@ -9,14 +9,18 @@ In this exercise, we'll use molecule in association with docker to spin up and t
 
 ## Section 1: Installing Components
 
-SSH into your node
+SSH into your control node.
 
 ### Step 1 - Docker
 
-We need to install and run the docker service. This will fire up our containers for testing images/roles. The docker package is in the extras repo so let's ensure that is enabled.
+We need to install and run the docker service. This will fire up our containers for testing images/roles.
+
+With RHEL8, docker has been superceded with podman/runc, but we can use Docker Community Edition to install native docker for this example.
 
 ```bash
-sudo yum-config-manager --enable rhui-REGION-rhel-server-extras
+sudo curl  https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
+sudo yum makecache
+sudo dnf -y  install docker-ce --nobest
 ```
 To run docker commands as a non-priviledged user we need to create a docker group and add our user to it. Replace x with your student id.
 
@@ -28,8 +32,8 @@ newgrp docker
 Now we can install docker and other dependencies for molecule.
 
 ```bash
-sudo yum -y install gcc docker python-devel
-sudo systemctl enable docker && sudo systemctl start docker
+#sudo yum -y install gcc docker python-devel <- check whether still needed
+sudo systemctl enable --now docker
 sudo systemctl status docker
 ```
 
