@@ -10,6 +10,12 @@ Blocks allow us to logically group our tasks. We will also use blocks to perform
 cd ~/ansible-files/
 ```
 
+To make our lives easier, we'll rename the previous web.html file to index.html:
+
+```bash
+mv roles/apache_vhost/files/web.html roles/apache_vhost/files/index.html
+```
+
 Let's move our role to use blocks first. We will also update our role to perform a smoke test by checking if we get a valid response code from our webservers.
 
 Using vi edit the `roles/apache_vhost/tasks/main.yml`. Delete the existing contents of the file and update it as follows.
