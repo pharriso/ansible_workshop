@@ -482,7 +482,109 @@ molecule test
     ├── converge
     └── destroy
 
-[output truncated]
+--> Scenario: 'default'
+--> Action: 'lint'
+--> Executing: yamllint .
+--> Scenario: 'default'
+--> Action: 'destroy'
+--> Sanity checks: 'docker'
+
+    PLAY [Destroy] *****************************************************************
+
+    TASK [Destroy molecule instance(s)] ********************************************
+    changed: [localhost] => (item=instance)
+
+    TASK [Wait for instance(s) deletion to complete] *******************************
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Delete docker network(s)] ************************************************
+
+    PLAY RECAP *********************************************************************
+    localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+--> Scenario: 'default'
+--> Action: 'syntax'
+
+    playbook: /home/student1/ansible-files/roles/apache_install/molecule/default/converge.yml
+--> Scenario: 'default'
+--> Action: 'create'
+
+    PLAY [Create] ******************************************************************
+
+    TASK [Log into a Docker registry] **********************************************
+    skipping: [localhost] => (item=None)
+
+    TASK [Check presence of custom Dockerfiles] ************************************
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Create Dockerfiles from image names] *************************************
+    changed: [localhost] => (item=None)
+    changed: [localhost]
+
+    TASK [Discover local Docker images] ********************************************
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Build an Ansible compatible image (new)] *********************************
+    ok: [localhost] => (item=molecule_local/centos:8)
+
+    TASK [Create docker network(s)] ************************************************
+
+    TASK [Determine the CMD directives] ********************************************
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Create molecule instance(s)] *********************************************
+    changed: [localhost] => (item=instance)
+
+    TASK [Wait for instance(s) creation to complete] *******************************
+    FAILED - RETRYING: Wait for instance(s) creation to complete (300 retries left).
+    changed: [localhost] => (item=None)
+    changed: [localhost]
+
+    PLAY RECAP *********************************************************************
+    localhost                  : ok=7    changed=3    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+
+--> Scenario: 'default'
+--> Action: 'converge'
+
+    PLAY [Converge] ****************************************************************
+
+    TASK [Gathering Facts] *********************************************************
+    ok: [instance]
+
+    TASK [Include apache_install] **************************************************
+
+    TASK [apache_install : Include other playbooks] ********************************
+    included: /home/student1/ansible-files/roles/apache_install/tasks/install_apache.yml for instance
+
+    TASK [apache_install : Install Apache] *****************************************
+    changed: [instance]
+
+    PLAY RECAP *********************************************************************
+    instance                   : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+--> Scenario: 'default'
+--> Action: 'destroy'
+
+    PLAY [Destroy] *****************************************************************
+
+    TASK [Destroy molecule instance(s)] ********************************************
+    changed: [localhost] => (item=instance)
+
+    TASK [Wait for instance(s) deletion to complete] *******************************
+    FAILED - RETRYING: Wait for instance(s) deletion to complete (300 retries left).
+    changed: [localhost] => (item=None)
+    changed: [localhost]
+
+    TASK [Delete docker network(s)] ************************************************
+
+    PLAY RECAP *********************************************************************
+    localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+--> Pruning extra files from scenario ephemeral directory
 ```
 
 Molecule will roll through the stages we've defined, doing the necessary syntax/lint checks, starting with a clean docker slate by removing any old running instances, creating a new running image, 'converging' the playbook/role into it, testing it and then finally removing everything we've done.
