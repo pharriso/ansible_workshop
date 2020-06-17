@@ -22,7 +22,7 @@ sudo curl  https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.r
 sudo yum makecache
 sudo dnf -y  install docker-ce --nobest
 ```
-To run docker commands as a non-priviledged user we need to create a docker group and add our user to it. Replace x with your student id.
+To run docker commands as a non-priviledged user we need to create a docker group and add our user to it. Replace x with your student id. NB. The docker group may already exist. This is fine.
 
 ```bash
 sudo groupadd docker
@@ -42,7 +42,7 @@ sudo systemctl status docker
 We use pip inside a virtualenv to install molecule:
 
 ```bash
-sudo yum -y install gcc python-pip python-devel openssl-devel libselinux-python libffi-devel git python-virtualenv yamllint
+sudo yum -y install openssl-devel  libffi-devel python3-virtualenv yamllint
 virtualenv --system-site-packages ~/molecule
 . ~/molecule/bin/activate
 pip install --upgrade setuptools pip
@@ -95,7 +95,8 @@ Commands:
   verify       Run automated tests against instances.
   
 $ molecule --version
-molecule, version 2.22
+molecule 3.0.4
+   ansible==2.9.9 python==3.6
 ```
 
 ## Section 2: Creating a New Role Framework
@@ -106,7 +107,7 @@ We'll use a simple apache role to test molecule.
 
 ```bash
 cd ~/ansible-files/roles
-molecule init role --role-name apache_install --driver-name docker
+molecule init role --driver-name docker apache_install
 --> Initializing new role apache_install...
 Initialized role in /home/student1/ansible-files/roles/apache_install successfully.
 ```
@@ -179,8 +180,6 @@ Once you're happy you can commit your code to SCM.
 
 ```bash
 molecule converge
---> Validating schema /home/student1/ansible-files/roles/apache_install/molecule/default/molecule.yml.
-Validation completed successfully.
 --> Test matrix
 
 └── default
@@ -192,53 +191,27 @@ Validation completed successfully.
 --> Scenario: 'default'
 --> Action: 'dependency'
 Skipping, missing the requirements file.
+Skipping, missing the requirements file.
 --> Scenario: 'default'
 --> Action: 'create'
-
-    PLAY [Create] ******************************************************************
-
-    TASK [Log into a Docker registry] **********************************************
-    skipping: [localhost] => (item=None)
-
-    TASK [Create Dockerfiles from image names] *************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Discover local Docker images] ********************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
-
-    TASK [Build an Ansible compatible image] ***************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Create docker network(s)] ************************************************
-
-    TASK [Create molecule instance(s)] *********************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Wait for instance(s) creation to complete] *******************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=5    changed=4    unreachable=0    failed=0
-
-
+Skipping, instances already created.
 --> Scenario: 'default'
 --> Action: 'prepare'
 Skipping, prepare playbook not configured.
 --> Scenario: 'default'
 --> Action: 'converge'
+--> Sanity checks: 'docker'
 
     PLAY [Converge] ****************************************************************
 
     TASK [Gathering Facts] *********************************************************
     ok: [instance]
 
+    TASK [Include apache_install] **************************************************
+
     PLAY RECAP *********************************************************************
-    instance                   : ok=1    changed=0    unreachable=0    failed=0
+    instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
 ```
 
 ### Step 3 - Configuring Molecule
@@ -256,8 +229,7 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
+lint: yamllint
 platforms:
   - name: instance
     image: centos:7
@@ -277,16 +249,13 @@ scenario:
     - destroy
 verifier:
   name: testinfra
-  lint:
-    name: flake8
+  lint: flake8
 ```
 
 Now do a test run. You should see some lint errors, something like this:
 
 ```bash
 molecule test
---> Validating schema /home/student1/ansible-files/roles/apache_install/molecule/default/molecule.yml.
-Validation completed successfully.
 --> Test matrix
 
 └── default
@@ -300,62 +269,34 @@ Validation completed successfully.
 
 --> Scenario: 'default'
 --> Action: 'lint'
---> Executing Yamllint on files found in /home/student1/ansible-files/roles/apache_install/...
-Lint completed successfully.
---> Executing Flake8 on files found in /home/student1/ansible-files/roles/apache_install/molecule/default/tests/...
-Lint completed successfully.
---> Executing Ansible Lint on /home/student1/ansible-files/roles/apache_install/molecule/default/playbook.yml...
-    [701] Role info should contain platforms
-    /home/student1/ansible-files/roles/apache_install/meta/main.yml:2
-    {'meta/main.yml': {'__file__': u'/home/student1/ansible-files/roles/apache_install/meta/main.yml', u'dependencies': [], u'galaxy_info': {u'description': u'your description', u'license': u'license (GPLv2, CC-BY, etc)', u'author': u'your name', u'company': u'your company (optional)', u'galaxy_tags': [], '__line__': 3, '__file__': u'/home/student1/ansible-files/roles/apache_install/meta/main.yml', u'min_ansible_version': 1.2}, '__line__': 2}}
-
-    [703] Should change default metadata: author
-    /home/student1/ansible-files/roles/apache_install/meta/main.yml:2
-    {'meta/main.yml': {'__file__': u'/home/student1/ansible-files/roles/apache_install/meta/main.yml', u'dependencies': [], u'galaxy_info': {u'description': u'your description', u'license': u'license (GPLv2, CC-BY, etc)', u'author': u'your name', u'company': u'your company (optional)', u'galaxy_tags': [], '__line__': 3, '__file__': u'/home/student1/apache_basic2/roles/apache_install/meta/main.yml', u'min_ansible_version': 1.2}, '__line__': 2}}
-
-    [703] Should change default metadata: description
-    /home/student1/ansible-files/roles/apache_install/meta/main.yml:2
-    {'meta/main.yml': {'__file__': u'/home/student1/ansible-files/roles/apache_install/meta/main.yml', u'dependencies': [], u'galaxy_info': {u'description': u'your description', u'license': u'license (GPLv2, CC-BY, etc)', u'author': u'your name', u'company': u'your company (optional)', u'galaxy_tags': [], '__line__': 3, '__file__': u'/home/student1/apache_basic2/roles/apache_install/meta/main.yml', u'min_ansible_version': 1.2}, '__line__': 2}}
-
-    [703] Should change default metadata: company
-    /home/student1/ansible-files/roles/apache_install/meta/main.yml:2
-    {'meta/main.yml': {'__file__': u'/home/student1/ansible-files/roles/apache_install/meta/main.yml', u'dependencies': [], u'galaxy_info': {u'description': u'your description', u'license': u'license (GPLv2, CC-BY, etc)', u'author': u'your name', u'company': u'your company (optional)', u'galaxy_tags': [], '__line__': 3, '__file__': u'/home/student1/apache_basic2/roles/apache_install/meta/main.yml', u'min_ansible_version': 1.2}, '__line__': 2}}
-
-    [703] Should change default metadata: license
-    /home/student1/ansible-files/roles/apache_install/meta/main.yml:2
-    {'meta/main.yml': {'__file__': u'/home/student1/ansible-files/roles/apache_install/meta/main.yml', u'dependencies': [], u'galaxy_info': {u'description': u'your description', u'license': u'license (GPLv2, CC-BY, etc)', u'author': u'your name', u'company': u'your company (optional)', u'galaxy_tags': [], '__line__': 3, '__file__': u'/home/student1/apache_basic2/roles/apache_install/meta/main.yml', u'min_ansible_version': 1.2}, '__line__': 2}}
-
+ERROR: Deprecated linter config found, migrate to v3 schema. See https://github.com/ansible-community/molecule/issues/2293
 An error occurred during the test sequence action: 'lint'. Cleaning up.
 --> Scenario: 'default'
+--> Action: 'cleanup'
+Skipping, cleanup playbook not configured.
+--> Scenario: 'default'
 --> Action: 'destroy'
+--> Sanity checks: 'docker'
 
     PLAY [Destroy] *****************************************************************
 
     TASK [Destroy molecule instance(s)] ********************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
+    changed: [localhost] => (item=instance)
 
     TASK [Wait for instance(s) deletion to complete] *******************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
+    FAILED - RETRYING: Wait for instance(s) deletion to complete (300 retries left).
+    changed: [localhost] => (item=None)
+    changed: [localhost]
 
     TASK [Delete docker network(s)] ************************************************
 
     PLAY RECAP *********************************************************************
-    localhost                  : ok=2    changed=1    unreachable=0    failed=0
+    localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+--> Pruning extra files from scenario ephemeral directory
 ```
 
-These relate to missing meta data that is expected. 
-
-You can fix this by either removing the meta file:
-
-```bash
-mv meta/main.yml meta/main.old
-```
-
-Or, fixing the errors suggested in the meta/main.yml file. (This is left up to you :)
-
-Run this to re-run your changes:
+You can check any changes you make to the configuration, using:
 
 ```bash
 molecule lint
