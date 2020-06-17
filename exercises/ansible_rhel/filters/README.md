@@ -188,7 +188,7 @@ cat >>defaults_sample.yml <<EOF
           - password | regex_search('[A-Z]')
           - password | regex_search('[a-z]')
           - password | regex_search('[0-9]')
-        fail_msg: "password does not need password complexity requirements (8+ Chars, Lower Case, Upper Case, Number)"
+        fail_msg: "password does not meet password complexity requirements (8+ Chars, Lower Case, Upper Case, Number)"
 EOF
 ```
 
@@ -263,7 +263,7 @@ fatal: [localhost]: FAILED! => {
     "assertion": "password | length > 7",
     "changed": false,
     "evaluated_to": false,
-    "msg": "password does not need password complexity requirements (8+ Chars, Lower Case, Upper Case, Number)"
+    "msg": "password does not meet password complexity requirements (8+ Chars, Lower Case, Upper Case, Number)"
 }
 
 PLAY RECAP *********************************************************************************************************************
