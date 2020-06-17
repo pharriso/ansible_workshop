@@ -342,9 +342,6 @@ molecule test
     instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 --> Scenario: 'default'
---> Action: 'verify'
-Skipping, no tests found.
---> Scenario: 'default'
 --> Action: 'destroy'
 
     PLAY [Destroy] *****************************************************************
@@ -394,27 +391,12 @@ Validation completed successfully.
 [output truncated...]
 ```
 
-This should FAIL when executing the testinfra stage which is part of the 'verify' action, as we haven't written the playbook yet for our automation steps!
+Let's not worry too much about this output as we've other things to do yet :)
 
-You should see something like:
-
-```
---> Scenario: 'default'
---> Action: 'verify'
---> Executing Testinfra tests found in /home/student1/ansible-files/roles/apache_install/molecule/default/tests/...
-ERROR: usage: pytest [options] [file_or_dir] [file_or_dir] [...]
-pytest: error: unrecognized arguments: --connection=ansible --ansible-inventory=/home/student1/.cache/molecule/apache_install/default/inventory/ansible_inventory.yml
-  inifile: None
-  rootdir: /home/student1/ansible-files/roles/apache_install/molecule/default
-
-An error occurred during the test sequence action: 'verify'. Cleaning up.
-```
-
-This is fine as just proves that your testinfra code is working as expected.
 
 ## Section 4: Write The Role Tasks
 
-So your testinfra will work, let's write the role contents!
+So your role testing is useful, let's write the role contents!
 
 ```bash
 vi ~/ansible-files/molecule_play.yml
@@ -498,7 +480,6 @@ molecule test
     ├── syntax
     ├── create
     ├── converge
-    ├── verify
     └── destroy
 
 [output truncated]
