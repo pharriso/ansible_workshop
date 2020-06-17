@@ -42,10 +42,10 @@ sudo systemctl status docker
 We use pip inside a virtualenv to install molecule:
 
 ```bash
-sudo yum -y install openssl-devel  libffi-devel python3-virtualenv yamllint
+sudo dnf -y install openssl-devel libffi-devel python3-virtualenv yamllint
 virtualenv --system-site-packages ~/molecule
 . ~/molecule/bin/activate
-pip install --upgrade setuptools pip
+pip install --upgrade setuptools pip ansible-lint pytest
 pip install --force molecule
 pip install molecule[docker]
 ```
@@ -229,7 +229,7 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint: yamllint
+lint: yamllint .
 platforms:
   - name: instance
     image: centos:7
@@ -252,7 +252,7 @@ verifier:
   lint: flake8
 ```
 
-Now do a test run. You should see some lint errors, something like this:
+Now do a test run. You should see something like this:
 
 ```bash
 molecule test
@@ -269,11 +269,7 @@ molecule test
 
 --> Scenario: 'default'
 --> Action: 'lint'
-ERROR: Deprecated linter config found, migrate to v3 schema. See https://github.com/ansible-community/molecule/issues/2293
-An error occurred during the test sequence action: 'lint'. Cleaning up.
---> Scenario: 'default'
---> Action: 'cleanup'
-Skipping, cleanup playbook not configured.
+--> Executing: yamllint .
 --> Scenario: 'default'
 --> Action: 'destroy'
 --> Sanity checks: 'docker'
@@ -284,7 +280,83 @@ Skipping, cleanup playbook not configured.
     changed: [localhost] => (item=instance)
 
     TASK [Wait for instance(s) deletion to complete] *******************************
-    FAILED - RETRYING: Wait for instance(s) deletion to complete (300 retries left).
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Delete docker network(s)] ************************************************
+
+    PLAY RECAP *********************************************************************
+    localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+--> Scenario: 'default'
+--> Action: 'syntax'
+
+    playbook: /home/student1/ansible-files/roles/apache_install/molecule/default/converge.yml
+--> Scenario: 'default'
+--> Action: 'create'
+
+    PLAY [Create] ******************************************************************
+
+    TASK [Log into a Docker registry] **********************************************
+    skipping: [localhost] => (item=None)
+
+    TASK [Check presence of custom Dockerfiles] ************************************
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Create Dockerfiles from image names] *************************************
+    changed: [localhost] => (item=None)
+    changed: [localhost]
+
+    TASK [Discover local Docker images] ********************************************
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Build an Ansible compatible image (new)] *********************************
+    changed: [localhost] => (item=molecule_local/centos:7)
+
+    TASK [Create docker network(s)] ************************************************
+
+    TASK [Determine the CMD directives] ********************************************
+    ok: [localhost] => (item=None)
+    ok: [localhost]
+
+    TASK [Create molecule instance(s)] *********************************************
+    changed: [localhost] => (item=instance)
+
+    TASK [Wait for instance(s) creation to complete] *******************************
+    FAILED - RETRYING: Wait for instance(s) creation to complete (300 retries left).
+    changed: [localhost] => (item=None)
+    changed: [localhost]
+
+    PLAY RECAP *********************************************************************
+    localhost                  : ok=7    changed=4    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+
+--> Scenario: 'default'
+--> Action: 'converge'
+
+    PLAY [Converge] ****************************************************************
+
+    TASK [Gathering Facts] *********************************************************
+    ok: [instance]
+
+    TASK [Include apache_install] **************************************************
+
+    PLAY RECAP *********************************************************************
+    instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+--> Scenario: 'default'
+--> Action: 'verify'
+Skipping, no tests found.
+--> Scenario: 'default'
+--> Action: 'destroy'
+
+    PLAY [Destroy] *****************************************************************
+
+    TASK [Destroy molecule instance(s)] ********************************************
+    changed: [localhost] => (item=instance)
+
+    TASK [Wait for instance(s) deletion to complete] *******************************
     changed: [localhost] => (item=None)
     changed: [localhost]
 
@@ -296,19 +368,15 @@ Skipping, cleanup playbook not configured.
 --> Pruning extra files from scenario ephemeral directory
 ```
 
-You can check any changes you make to the configuration, using:
-
-```bash
-molecule lint
-```
-
 ### Step 4 - Testing Your Roles
 
 testinfra is included as the default verifier step of molecule. Testinfra uses pytest and makes it easy to test the system after the role is run to ensure our created role has the results that we expected.
 
 We'll not be doing much with it here, but will perform a simple "is package httpd installed" test for validation
 
-Change the test_default.py file to reflect the following. Note: spacing must be consistent (this is Python after all). Don't mix tabs and spaces else molecule will throw errors later on!
+Change the test_default.py file to reflect the following. You may need to mkdir the tests directory.
+
+Note: spacing must be consistent (this is Python after all). Don't mix tabs and spaces else molecule will throw errors later on!
 
 ```bash
 cat molecule/default/tests/test_default.py
@@ -348,34 +416,19 @@ Validation completed successfully.
 [output truncated...]
 ```
 
-This should FAIL when doing the testinfra as we haven't written the playbook yet for our automation steps.
+This should FAIL when executing the testinfra stage which is part of the 'verify' action, as we haven't written the playbook yet for our automation steps!
+
 You should see something like:
 
 ```
 --> Scenario: 'default'
 --> Action: 'verify'
 --> Executing Testinfra tests found in /home/student1/ansible-files/roles/apache_install/molecule/default/tests/...
-    ============================= test session starts ==============================
-    platform linux2 -- Python 2.7.5, pytest-4.4.0, py-1.8.0, pluggy-0.9.0
-    rootdir: /home/student1/ansible-files/roles/apache_install/molecule/default
-    plugins: testinfra-1.19.0
-collected 1 item
+ERROR: usage: pytest [options] [file_or_dir] [file_or_dir] [...]
+pytest: error: unrecognized arguments: --connection=ansible --ansible-inventory=/home/student1/.cache/molecule/apache_install/default/inventory/ansible_inventory.yml
+  inifile: None
+  rootdir: /home/student1/ansible-files/roles/apache_install/molecule/default
 
-    tests/test_default.py F                                                  [100%]
-
-    =================================== FAILURES ===================================
-    ___________________ test_httpd_installed[ansible://instance] ___________________
-
-    host = <testinfra.host.Host object at 0x7f2ca393cf10>
-
-        def test_httpd_installed(host):
-            httpd = host.package('httpd')
-    >       assert httpd.is_installed
-    E       assert False
-    E        +  where False = <package httpd>.is_installed
-
-    tests/test_default.py:11: AssertionError
-    =========================== 1 failed in 6.25 seconds ===========================
 An error occurred during the test sequence action: 'verify'. Cleaning up.
 ```
 
@@ -429,25 +482,25 @@ Let's first test the playbook to prove we've written something useful and workab
 ```bash
 ansible-playbook ~/ansible-files/molecule_play.yml
 
-PLAY [Main Playbook (molecule_play.yml)] ***********************************************************************************************************************
+PLAY [Main Playbook] **********************************************************************************************************
 
-TASK [Gathering Facts] ********************************************************************************************************************************
+TASK [Gathering Facts] ********************************************************************************************************
 ok: [node1]
 ok: [node2]
 ok: [node3]
 
-TASK [apache_install : Include other playbooks] *******************************************************************************************************
+TASK [apache_install : Include other playbooks] *******************************************************************************
 included: /home/student1/ansible-files/roles/apache_install/tasks/install_apache.yml for node1, node2, node3
 
-TASK [apache_install : Install Apache] ****************************************************************************************************************
-ok: [node3]
-ok: [node2]
-ok: [node1]
+TASK [apache_install : Install Apache] ****************************************************************************************
+changed: [node1]
+changed: [node2]
+changed: [node3]
 
-PLAY RECAP ********************************************************************************************************************************************
-node1                      : ok=3    changed=0    unreachable=0    failed=0
-node2                      : ok=3    changed=0    unreachable=0    failed=0
-node3                      : ok=3    changed=0    unreachable=0    failed=0
+PLAY RECAP ********************************************************************************************************************
+node1                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+node2                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+node3                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
@@ -459,8 +512,6 @@ Now let's do a full on test using molecule:
 
 cd ~/ansible-files/roles/apache_install
 molecule test
---> Validating schema /home/student1/ansible_files/roles/apache_install/molecule/default/molecule.yml.
-Validation completed successfully.
 --> Test matrix
 
 └── default
@@ -472,122 +523,10 @@ Validation completed successfully.
     ├── verify
     └── destroy
 
---> Scenario: 'default'
---> Action: 'lint'
---> Executing Yamllint on files found in /home/student1/ansible-files/roles/apache_install/...
-Lint completed successfully.
---> Executing Flake8 on files found in /home/student1/ansible-files/roles/apache_install/molecule/default/tests/...
-Lint completed successfully.
---> Executing Ansible Lint on /home/student1/ansible-files/roles/apache_install/molecule/default/playbook.yml...
-Lint completed successfully.
---> Scenario: 'default'
---> Action: 'destroy'
-
-    PLAY [Destroy] *****************************************************************
-
-    TASK [Destroy molecule instance(s)] ********************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Wait for instance(s) deletion to complete] *******************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
-
-    TASK [Delete docker network(s)] ************************************************
-
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=2    changed=1    unreachable=0    failed=0
-
-
---> Scenario: 'default'
---> Action: 'syntax'
-
-    playbook: /home/student1/ansible-files/roles/apache_install/molecule/default/playbook.yml
-
---> Scenario: 'default'
---> Action: 'create'
-
-    PLAY [Create] ******************************************************************
-
-    TASK [Log into a Docker registry] **********************************************
-    skipping: [localhost] => (item=None)
-
-    TASK [Create Dockerfiles from image names] *************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Discover local Docker images] ********************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
-
-    TASK [Build an Ansible compatible image] ***************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Create docker network(s)] ************************************************
-
-    TASK [Create molecule instance(s)] *********************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Wait for instance(s) creation to complete] *******************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=5    changed=4    unreachable=0    failed=0
-
-
---> Scenario: 'default'
---> Action: 'converge'
-
-    PLAY [Converge] ****************************************************************
-
-    TASK [Gathering Facts] *********************************************************
-    ok: [instance]
-
-    TASK [apache_install : Include other playbooks] ********************************
-    included: /home/student1/ansible-files/roles/apache_install/tasks/install_apache.yml for instance
-
-    TASK [apache_install : Install Apache] *****************************************
-    changed: [instance]
-
-    PLAY RECAP *********************************************************************
-    instance                   : ok=3    changed=1    unreachable=0    failed=0
-
-
---> Scenario: 'default'
---> Action: 'verify'
---> Executing Testinfra tests found in /home/student1/ansible-files/roles/apache_install/molecule/default/tests/...
-    ============================= test session starts ==============================
-    platform linux2 -- Python 2.7.5, pytest-4.3.0, py-1.8.0, pluggy-0.9.0
-    rootdir: /home/student1/ansible-files/roles/apache_install/molecule/default, inifile:
-    plugins: testinfra-1.16.0
-collected 1 item
-
-    tests/test_default.py .                                                  [100%]
-
-    =========================== 1 passed in 6.29 seconds ===========================
-Verifier completed successfully.
---> Scenario: 'default'
---> Action: 'destroy'
-
-    PLAY [Destroy] *****************************************************************
-
-    TASK [Destroy molecule instance(s)] ********************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Wait for instance(s) deletion to complete] *******************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Delete docker network(s)] ************************************************
-
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=2    changed=2    unreachable=0    failed=0
-
+[output truncated]
 ```
+
+Molecule will roll through the stages we've defined, doing the necessary syntax/lint checks, starting with a clean docker sheet by removing any old running instances, creating a new running image, 'converging' the playbook/role into it, testing it and then finally removing everything we've done.
 
 ## Summary: The Finished Playbook
 
