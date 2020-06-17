@@ -100,7 +100,7 @@ ansible-playbook test_apache_role.yml
 
 Our playbook has failed now. We tried to smoke test our website on port 8080 but our webserver is now mis-configured and is listening on port 8081.
 
-## Step 3: rescue to the rescue
+## Step 4: rescue to the rescue
 
 Let's update our `roles/apache-vhost/tasks/main.yml` file and add a rescue section at the end. The rescue section of the block will run if any errors are encountered. Here we are going to copy our original httpd.conf file back in place if we encounter any errors, force any handlers to run and then smoke test our website again.
 
@@ -126,7 +126,7 @@ Let's update our `roles/apache-vhost/tasks/main.yml` file and add a rescue secti
 ```
 <!-- {% endraw %} -->
 
-## Step 4: The Finished role
+## Step 5: The Finished role
 
 Your finished role should now look like this.
 
