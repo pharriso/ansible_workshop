@@ -45,7 +45,7 @@ We use pip inside a virtualenv to install molecule:
 sudo dnf -y install openssl-devel libffi-devel python3-virtualenv yamllint
 virtualenv --system-site-packages ~/molecule
 . ~/molecule/bin/activate
-pip install --upgrade setuptools pip ansible-lint pytest
+pip install --upgrade setuptools pip ansible-lint pytest testinfra
 pip install --force molecule
 pip install molecule[docker]
 ```
@@ -245,11 +245,8 @@ scenario:
     - syntax
     - create
     - converge
-    - verify
+#    - verify
     - destroy
-verifier:
-  name: testinfra
-  lint: flake8
 ```
 
 Now do a test run. You should see something like this:
@@ -264,7 +261,6 @@ molecule test
     ├── syntax
     ├── create
     ├── converge
-    ├── verify
     └── destroy
 
 --> Scenario: 'default'
@@ -313,7 +309,7 @@ molecule test
     ok: [localhost]
 
     TASK [Build an Ansible compatible image (new)] *********************************
-    changed: [localhost] => (item=molecule_local/centos:7)
+    changed: [localhost] => (item=molecule_local/centos:8)
 
     TASK [Create docker network(s)] ************************************************
 
@@ -368,30 +364,12 @@ Skipping, no tests found.
 --> Pruning extra files from scenario ephemeral directory
 ```
 
-### Step 4 - Testing Your Roles
+### Step 4 - (Double) Testing Your Roles
 
-testinfra is included as the default verifier step of molecule. Testinfra uses pytest and makes it easy to test the system after the role is run to ensure our created role has the results that we expected.
+testinfra, a python tool can be used as a verifier step for molecule. Testinfra uses pytest and makes it easy to test the system after the role is run to ensure our created role has the results that we expected. But as this requires python coding knowledge, this is beyond the scope of this exercise.
 
-We'll not be doing much with it here, but will perform a simple "is package httpd installed" test for validation
+You would need to uncomment the verifier stage in molecule.yml (see above) for it to run any verification using this method.
 
-Change the test_default.py file to reflect the following. You may need to mkdir the tests directory.
-
-Note: spacing must be consistent (this is Python after all). Don't mix tabs and spaces else molecule will throw errors later on!
-
-```bash
-cat molecule/default/tests/test_default.py
-import os
-
-import testinfra.utils.ansible_runner
-
-testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
-
-
-def test_httpd_installed(host):
-    httpd = host.package('httpd')
-    assert httpd.is_installed
-```
 
 ### Step 5 - Dummy Full Test
 
@@ -526,7 +504,7 @@ molecule test
 [output truncated]
 ```
 
-Molecule will roll through the stages we've defined, doing the necessary syntax/lint checks, starting with a clean docker sheet by removing any old running instances, creating a new running image, 'converging' the playbook/role into it, testing it and then finally removing everything we've done.
+Molecule will roll through the stages we've defined, doing the necessary syntax/lint checks, starting with a clean docker slate by removing any old running instances, creating a new running image, 'converging' the playbook/role into it, testing it and then finally removing everything we've done.
 
 ## Summary: The Finished Playbook
 
