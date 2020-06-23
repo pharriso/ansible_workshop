@@ -2,6 +2,10 @@
 
 - hosts: all
   become: yes
+  vars_prompt:
+  - name: cockpit_password
+    prompt: "cockpit user password"
+    private: no
   tasks:
   - name: stop tower
     shell: ansible-tower-service stop
@@ -60,6 +64,11 @@
       dest: /etc/cockpit/ws-certs.d/cockpit.cert
       regexp: 'pem$'
     notify: restart cockpit
+
+  - name: add cockpit user
+    user:
+      name: cockpit
+      password: "{{ cockpit_password | password_hash('sha512', 'mysecretsalt') }}"
 
   handlers:
   - name: systemd reload
