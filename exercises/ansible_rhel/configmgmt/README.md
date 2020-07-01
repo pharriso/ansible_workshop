@@ -36,7 +36,7 @@ First you have to set up the Git repo as Projects like you normally would. You h
   
     - **SCM URL:** https://github.com/pharriso/uk_ansible_workshop_playbooks.git
 
-    - **SCM UPDATE OPTIONS:** Tick all three boxes.
+    - **SCM UPDATE OPTIONS:** Tick the Clean, Delete and Update options.
 
 - Click **SAVE**
 
