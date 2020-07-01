@@ -161,7 +161,7 @@ vault token lookup | grep '^id' | awk '{print $2}'
 Before we can run our next playbook, we need to install some helpful modules:
 
 ```bash
-sudo pip install ansible-modules-hashivault
+sudo pip3 install ansible-modules-hashivault
 ```
 
 We can now add some credentials. Run the following **verbose** playbook, supplying **your** assigned student/password details:

@@ -9,7 +9,7 @@ In this exercise we will use Ansible to check the configuration of our linux ser
 In order to use the ServiceNow modules, we need to do a one time install of the dependencies, on the ansible control [Tower] node. Login to your control node and type:
 
 ```bash
-sudo pip install pysnow
+sudo pip3 install pysnow
 ```
 
 ## Set up Projects
