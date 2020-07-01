@@ -164,6 +164,13 @@ Before we can run our next playbook, we need to install some helpful modules:
 sudo pip3 install ansible-modules-hashivault
 ```
 
+So that we can pick up the newly installed modules, we need to set a couple of environment variables:
+
+```bash
+export ANSIBLE_LIBRARY=/usr/share/ansible/plugins/modules:/usr/local/lib/python3.6/site-packages/ansible/modules/
+export ANSIBLE_MODULE_UTILS=/usr/share/ansible/plugins/module_utils/:/usr/local/lib/python3.6/site-packages/ansible/module_utils/
+```
+
 We can now add some credentials. Run the following **verbose** playbook, supplying **your** assigned student/password details:
 
 ```bash
