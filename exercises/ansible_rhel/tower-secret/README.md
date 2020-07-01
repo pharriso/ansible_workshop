@@ -150,7 +150,7 @@ Key                  Value
 token                s.83I8gWop4i79dFWWoiu3YuqC
 token_accessor       cRlwkLm3UmiSwShvSsW9pJnE
 token_duration       ∞
-token_renewable      falsec
+token_renewable      false
 token_policies       ["root"]
 identity_policies    []
 ```
