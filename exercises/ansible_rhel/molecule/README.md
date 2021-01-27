@@ -308,230 +308,65 @@ INFO     Running default > list
   instance      │ podman      │ ansible          │ default       │ false   │ false
 ```
 
-### Step 2 - Further Testing
+### Step 2 - Testing Roles
 
-A typical dev cycle is : write some plays/roles -> molecule converge -> rinse and repeat...
+A typical dev cycle is : write some plays/roles -> **molecule converge** -> rinse and repeat...
+Once you're happy with the results, a **molecule test** does a full rinse cycle
 Once you're happy you can commit your code to SCM.
+
+Right out-the-box *converge* should work as it has a template *molecule/default/converge.yml*:
+
+```bash
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include apache_install"
+      include_role:
+        name: "apache_install"
+```
+
+As we haven't written anything in the role to test yet, it just falls through but it shows the principle:
 
 ```bash
 molecule converge
---> Test matrix
+INFO     default scenario test matrix: dependency, create, prepare, converge
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > create
+WARNING  Skipping, instances already created.
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
+INFO     Running default > converge
+INFO     Sanity checks: 'podman'
 
-└── default
-    ├── dependency
-    ├── create
-    ├── prepare
-    └── converge
+PLAY [Converge] ****************************************************************
 
---> Scenario: 'default'
---> Action: 'dependency'
-Skipping, missing the requirements file.
-Skipping, missing the requirements file.
---> Scenario: 'default'
---> Action: 'create'
-Skipping, instances already created.
---> Scenario: 'default'
---> Action: 'prepare'
-Skipping, prepare playbook not configured.
---> Scenario: 'default'
---> Action: 'converge'
---> Sanity checks: 'docker'
+TASK [Gathering Facts] *********************************************************
 
-    PLAY [Converge] ****************************************************************
 
-    TASK [Gathering Facts] *********************************************************
-    ok: [instance]
+ok: [instance]
 
-    TASK [Include apache_install] **************************************************
+TASK [Include apache_install] **************************************************
 
-    PLAY RECAP *********************************************************************
-    instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+PLAY RECAP *********************************************************************
+instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ```
 
-### Step 3 - Configuring Molecule
-
-You can see from above that a few things have been skipped. You can tune a lot of the molecule config and what you want it to do by changing the molecule.yml file.
-
-Let's define the test sequence we want. We'll add the test_sequence block under the default scenario.
-
-Change molecule.yml to reflect this:
-
+Notice the first INFO line containing:
 ```bash
-cat molecule/default/molecule.yml
----
-dependency:
-  name: galaxy
-driver:
-  name: docker
-lint: yamllint .
-platforms:
-  - name: instance
-    image: centos:7
-provisioner:
-  name: ansible
-  lint:
-    name: ansible-lint
-scenario:
-  name: default
-  test_sequence:
-    - lint
-    - destroy
-    - syntax
-    - create
-    - converge
-#    - verify
-    - destroy
+INFO     default scenario test matrix: dependency, create, prepare, converge
 ```
 
-Now do a test run. You should see something like this:
-
-```bash
-molecule test
---> Test matrix
-
-└── default
-    ├── lint
-    ├── destroy
-    ├── syntax
-    ├── create
-    ├── converge
-    └── destroy
-
---> Scenario: 'default'
---> Action: 'lint'
---> Executing: yamllint .
---> Scenario: 'default'
---> Action: 'destroy'
---> Sanity checks: 'docker'
-
-    PLAY [Destroy] *****************************************************************
-
-    TASK [Destroy molecule instance(s)] ********************************************
-    changed: [localhost] => (item=instance)
-
-    TASK [Wait for instance(s) deletion to complete] *******************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
-
-    TASK [Delete docker network(s)] ************************************************
-
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
-
---> Scenario: 'default'
---> Action: 'syntax'
-
-    playbook: /home/student1/ansible-files/roles/apache_install/molecule/default/converge.yml
---> Scenario: 'default'
---> Action: 'create'
-
-    PLAY [Create] ******************************************************************
-
-    TASK [Log into a Docker registry] **********************************************
-    skipping: [localhost] => (item=None)
-
-    TASK [Check presence of custom Dockerfiles] ************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
-
-    TASK [Create Dockerfiles from image names] *************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Discover local Docker images] ********************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
-
-    TASK [Build an Ansible compatible image (new)] *********************************
-    changed: [localhost] => (item=molecule_local/centos:8)
-
-    TASK [Create docker network(s)] ************************************************
-
-    TASK [Determine the CMD directives] ********************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
-
-    TASK [Create molecule instance(s)] *********************************************
-    changed: [localhost] => (item=instance)
-
-    TASK [Wait for instance(s) creation to complete] *******************************
-    FAILED - RETRYING: Wait for instance(s) creation to complete (300 retries left).
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=7    changed=4    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
-
---> Scenario: 'default'
---> Action: 'converge'
-
-    PLAY [Converge] ****************************************************************
-
-    TASK [Gathering Facts] *********************************************************
-    ok: [instance]
-
-    TASK [Include apache_install] **************************************************
-
-    PLAY RECAP *********************************************************************
-    instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-
---> Scenario: 'default'
---> Action: 'destroy'
-
-    PLAY [Destroy] *****************************************************************
-
-    TASK [Destroy molecule instance(s)] ********************************************
-    changed: [localhost] => (item=instance)
-
-    TASK [Wait for instance(s) deletion to complete] *******************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
-
-    TASK [Delete docker network(s)] ************************************************
-
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
-
---> Pruning extra files from scenario ephemeral directory
-```
-
-### Step 4 - (Double) Testing Your Roles
-
-testinfra, a python tool can be used as a verifier step for molecule. Testinfra uses pytest and makes it easy to test the system after the role is run to ensure our created role has the results that we expected. But as this requires python coding knowledge, this is beyond the scope of this exercise.
-
-You would need to uncomment the verifier stage in molecule.yml (see above) for it to run any verification using this method.
+This shows us the things that are going to happen as part of the flow. All these parts can be customised, but for now we'll just use the defauls.
 
 
-### Step 5 - Dummy Full Test
 
-Let's run molecule test to see the full cycle in action:
+### Step 3: Write The Role Tasks
 
-```bash
-molecule test
---> Validating schema /home/student1/ansible-files/roles/apache_install/molecule/default/molecule.yml.
-Validation completed successfully.
---> Test matrix
-
-└── default
-    ├── lint
-    ├── destroy
-    ├── syntax
-    ├── create
-    ├── converge
-    ├── verify
-    └── destroy
-
---> Scenario: 'default'
-[output truncated...]
-```
-
-Let's not worry too much about this output as we've other things to do yet :)
-
-
-## Section 4: Write The Role Tasks
-
-So your role testing is useful, let's write the role contents!
+Time to write the role contents!
 
 ```bash
 vi ~/ansible-files/molecule_play.yml
@@ -569,167 +404,204 @@ vi ~/ansible-files/roles/apache_install/tasks/install_apache.yml
   become: "yes"
 ```
 
+### Step 4 - Test The Role
 
-## Section 5: Full Test Run
-
-Let's first test the playbook to prove we've written something useful and workable:
+Let's run *converge* again and see what happens:
 
 ```bash
-ansible-playbook ~/ansible-files/molecule_play.yml
+molecule converge
+INFO     default scenario test matrix: dependency, create, prepare, converge
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > create
+WARNING  Skipping, instances already created.
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
+INFO     Running default > converge
+INFO     Sanity checks: 'podman'
 
-PLAY [Main Playbook] **********************************************************************************************************
+PLAY [Converge] ****************************************************************
 
-TASK [Gathering Facts] ********************************************************************************************************
-ok: [node1]
-ok: [node2]
-ok: [node3]
+TASK [Gathering Facts] *********************************************************
+ok: [instance]
 
-TASK [apache_install : Include other playbooks] *******************************************************************************
-included: /home/student1/ansible-files/roles/apache_install/tasks/install_apache.yml for node1, node2, node3
+TASK [Include apache_install] **************************************************
 
-TASK [apache_install : Install Apache] ****************************************************************************************
-changed: [node1]
-changed: [node2]
-changed: [node3]
+TASK [apache_install : Include other playbooks] ********************************
+included: /home/vagrant/ansible-files/roles/apache_install/tasks/install_apache.yml for instance
 
-PLAY RECAP ********************************************************************************************************************
-node1                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-node2                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-node3                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+TASK [apache_install : Install Apache] *****************************************
+changed: [instance]
 
+PLAY RECAP *********************************************************************
+instance                   : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
-So that worked :)
+You can see that molecule is now picking up and running our role!
 
-Now let's do a full on test using molecule:
+(Try running it again to check that idempotency, if you want)
+
+So now you can write and test your role by repeating the above cycle. Neat.
+
+## Step 5: Full Test Run
+
+Once you've finished your role, use *test* to put it through more extensive testing.
+
+You'll notice, how the *test* flow is different from *converge*:
 
 ```bash
+INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+```
 
-cd ~/ansible-files/roles/apache_install
+We're doing a lot more testing in and around the role now!
+
+```bash
 molecule test
---> Test matrix
+INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > lint
+INFO     Lint is disabled.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+INFO     Sanity checks: 'podman'
 
-└── default
-    ├── lint
-    ├── destroy
-    ├── syntax
-    ├── create
-    ├── converge
-    └── destroy
+PLAY [Destroy] *****************************************************************
 
---> Scenario: 'default'
---> Action: 'lint'
---> Executing: yamllint .
---> Scenario: 'default'
---> Action: 'destroy'
---> Sanity checks: 'docker'
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
 
-    PLAY [Destroy] *****************************************************************
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: Wait for instance(s) deletion to complete (300 retries left).
+FAILED - RETRYING: Wait for instance(s) deletion to complete (299 retries left).
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '222214046033.15586', 'results_file': '/home/vagrant/.ansible_async/222214046033.15586', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
 
-    TASK [Destroy molecule instance(s)] ********************************************
-    changed: [localhost] => (item=instance)
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
-    TASK [Wait for instance(s) deletion to complete] *******************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
+INFO     Running default > syntax
 
-    TASK [Delete docker network(s)] ************************************************
+playbook: /home/vagrant/ansible-files/roles/apache_install/molecule/default/converge.yml
+INFO     Running default > create
 
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+PLAY [Create] ******************************************************************
 
---> Scenario: 'default'
---> Action: 'syntax'
+TASK [Log into a container registry] *******************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
 
-    playbook: /home/student1/ansible-files/roles/apache_install/molecule/default/converge.yml
---> Scenario: 'default'
---> Action: 'create'
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
 
-    PLAY [Create] ******************************************************************
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
 
-    TASK [Log into a Docker registry] **********************************************
-    skipping: [localhost] => (item=None)
+TASK [Discover local Podman images] ********************************************
+ok: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
 
-    TASK [Check presence of custom Dockerfiles] ************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
+TASK [Build an Ansible compatible image] ***************************************
+skipping: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
 
-    TASK [Create Dockerfiles from image names] *************************************
-    changed: [localhost] => (item=None)
-    changed: [localhost]
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
 
-    TASK [Discover local Docker images] ********************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
 
-    TASK [Build an Ansible compatible image (new)] *********************************
-    ok: [localhost] => (item=molecule_local/centos:8)
+TASK [Wait for instance(s) creation to complete] *******************************
+FAILED - RETRYING: Wait for instance(s) creation to complete (300 retries left).
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '886186648632.15751', 'results_file': '/home/vagrant/.ansible_async/886186648632.15751', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
 
-    TASK [Create docker network(s)] ************************************************
+PLAY RECAP *********************************************************************
+localhost                  : ok=5    changed=2    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
 
-    TASK [Determine the CMD directives] ********************************************
-    ok: [localhost] => (item=None)
-    ok: [localhost]
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
+INFO     Running default > converge
 
-    TASK [Create molecule instance(s)] *********************************************
-    changed: [localhost] => (item=instance)
+PLAY [Converge] ****************************************************************
 
-    TASK [Wait for instance(s) creation to complete] *******************************
-    FAILED - RETRYING: Wait for instance(s) creation to complete (300 retries left).
-    changed: [localhost] => (item=None)
-    changed: [localhost]
+TASK [Gathering Facts] *********************************************************
+ok: [instance]
 
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=7    changed=3    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+TASK [Include apache_install] **************************************************
 
---> Scenario: 'default'
---> Action: 'converge'
+TASK [apache_install : Include other playbooks] ********************************
+included: /home/vagrant/ansible-files/roles/apache_install/tasks/install_apache.yml for instance
 
-    PLAY [Converge] ****************************************************************
+TASK [apache_install : Install Apache] *****************************************
+changed: [instance]
 
-    TASK [Gathering Facts] *********************************************************
-    ok: [instance]
+PLAY RECAP *********************************************************************
+instance                   : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
-    TASK [Include apache_install] **************************************************
+INFO     Running default > idempotence
 
-    TASK [apache_install : Include other playbooks] ********************************
-    included: /home/student1/ansible-files/roles/apache_install/tasks/install_apache.yml for instance
+PLAY [Converge] ****************************************************************
 
-    TASK [apache_install : Install Apache] *****************************************
-    changed: [instance]
+TASK [Gathering Facts] *********************************************************
+ok: [instance]
 
-    PLAY RECAP *********************************************************************
-    instance                   : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+TASK [Include apache_install] **************************************************
 
---> Scenario: 'default'
---> Action: 'destroy'
+TASK [apache_install : Include other playbooks] ********************************
+included: /home/vagrant/ansible-files/roles/apache_install/tasks/install_apache.yml for instance
 
-    PLAY [Destroy] *****************************************************************
+TASK [apache_install : Install Apache] *****************************************
+ok: [instance]
 
-    TASK [Destroy molecule instance(s)] ********************************************
-    changed: [localhost] => (item=instance)
+PLAY RECAP *********************************************************************
+instance                   : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
-    TASK [Wait for instance(s) deletion to complete] *******************************
-    FAILED - RETRYING: Wait for instance(s) deletion to complete (300 retries left).
-    changed: [localhost] => (item=None)
-    changed: [localhost]
+INFO     Idempotence completed successfully.
+INFO     Running default > side_effect
+WARNING  Skipping, side effect playbook not configured.
+INFO     Running default > verify
+INFO     Running Ansible Verifier
 
-    TASK [Delete docker network(s)] ************************************************
+PLAY [Verify] ******************************************************************
 
-    PLAY RECAP *********************************************************************
-    localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+TASK [Example assertion] *******************************************************
+ok: [instance] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
 
---> Pruning extra files from scenario ephemeral directory
+PLAY RECAP *********************************************************************
+instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Verifier completed successfully.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: Wait for instance(s) deletion to complete (300 retries left).
+FAILED - RETRYING: Wait for instance(s) deletion to complete (299 retries left).
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '710465571993.16827', 'results_file': '/home/vagrant/.ansible_async/710465571993.16827', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
 ```
 
-Molecule will roll through the stages we've defined, doing the necessary syntax/lint checks, starting with a clean docker slate by removing any old running instances, creating a new running image, 'converging' the playbook/role into it, testing it and then finally removing everything we've done.
+## Section 4: Customising Molecule
+
+Out-the-box molecule gives us something really useful to start with, but we can chop and change what we what to happen.
+
+**_TBC_**
 
 ## Summary: The Finished Playbook
 
 You've explored the basics around using molecule for tesing Ansible.
-
-Much of this content was based around Jeff Geerling's most excellent blog:
-https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule
 
 ---
 
