@@ -96,7 +96,7 @@ Commands:
   
 $ molecule --version
 molecule 3.2.2 using python 3.6
-    ansible:2.9.16
+    ansible:2.10.5
     delegated:3.2.2 from molecule
     podman:0.3.0 from molecule_podman
 ```
@@ -108,12 +108,13 @@ We'll use a simple apache role to test molecule.
 ### Step 1 - Initalise New Role
 
 ```bash
+mkdir -p ~/ansible-files/roles
 cd ~/ansible-files/roles
 molecule init role apache_install --driver-name podman
 INFO     Initializing new role apache_install...
-Using /home/student1/.ansible.cfg as config file
+...
 - Role apache_install was created successfully
-INFO     Initialized role in /home/student1/ansible-files/roles/apache_install successfully.
+INFO     Initialized role in /home/.../ansible-files/roles/apache_install successfully.
 ```
 
 Let's have a look at what was created:
@@ -156,11 +157,93 @@ Straight out the box, we should be able to do things:
 
 ```bash
 cd apache_install
-molecule create (check out 'docker images' and 'docker ps' output)
-molecule verify
+molecule create
+INFO     default scenario test matrix: dependency, create, prepare
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > create
+INFO     Sanity checks: 'podman'
+
+PLAY [Create] ***********************************************************************************************************************
+
+TASK [Log into a container registry] ************************************************************************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Check presence of custom Dockerfiles] *****************************************************************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Create Dockerfiles from image names] ******************************************************************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Discover local Podman images] *************************************************************************************************
+ok: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
+
+TASK [Build an Ansible compatible image] ********************************************************************************************
+skipping: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
+
+TASK [Determine the CMD directives] *************************************************************************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Create molecule instance(s)] **************************************************************************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Wait for instance(s) creation to complete] ************************************************************************************
+FAILED - RETRYING: Wait for instance(s) creation to complete (300 retries left).
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '298323079824.101297', 'results_file': '/home/student2/.ansible_async/298323079824.101297', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP **************************************************************************************************************************
+localhost                  : ok=5    changed=2    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0
+
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
 ```
 
 Hopefully that works, so you now have a test framework to work with.
+
+So what did this do and why is it useful?
+
+The 'create' directive effectively spins up some infra we can use to test our role without doing such else.
+
+If we take a look at:
+
+```bash
+cat molecule/default/molecule.yml
+---
+dependency:
+  name: galaxy
+driver:
+  name: podman
+platforms:
+  - name: instance
+    image: docker.io/pycontribs/centos:8
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+```
+
+This helps us to see what's being used. 
+
+The default in the path referes to a 'scenario', and there is always default out-the-box. There is no need to change that for our basic testing example.
+
+We can see that molecule is going to use the podman driver and for a target platform spin up a container instance using a centos8 image.
+
+We can see this in action, using:
+
+```bash
+podman images
+REPOSITORY                   TAG     IMAGE ID      CREATED        SIZE
+docker.io/pycontribs/centos  8       0e8bfa1c168c  10 months ago  752 MB
+
+podman ps
+CONTAINER ID  IMAGE                          COMMAND               CREATED         STATUS             PORTS   NAMES
+f07640ca9996  docker.io/pycontribs/centos:8  bash -c while tru...  14 minutes ago  Up 14 minutes ago          instance
+```
+
+So we have a local centos container image and it's running from the 'molecule create'
+
 
 ### Step 2 - Further Testing
 
