@@ -4,7 +4,11 @@ Molecule is designed to aid in the development and testing of Ansible roles. Mol
 
 Molecule uses Ansible playbooks to exercise the role and its associated tests. So we eat our own dog food :)
 
-In this exercise, we'll use molecule in association with docker to spin up and test our role.
+In this exercise, we'll use molecule in association with podman, a drop-in rootless replacement for docker, to spin up and test our role.
+
+Note: molecule is an upstream open source project, very liable to change.
+
+(This exercise was last tested against - Red Hat Enterprise Linux release 8.3 (Ootpa) - on 27 January 2021)
 
 
 ## Section 1: Installing Components
@@ -13,28 +17,25 @@ SSH into your control node.
 
 ### Step 1 - Docker
 
-We need to install and run the docker service. This will fire up our containers for testing images/roles.
-
-With RHEL8, docker has been superceded with podman/runc, but we can use Docker Community Edition to install native docker for this example.
+Now we can install podman and other dependencies for molecule.
 
 ```bash
-sudo curl  https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
-sudo yum makecache
-sudo dnf -y  install docker-ce --nobest
+sudo yum -y install podman
+sudo systemctl enable podman.socket && sudo systemctl start podman
 ```
-To run docker commands as a non-priviledged user we need to create a docker group and add our user to it. Replace x with your student id. NB. The docker group may already exist. This is fine.
 
+Podman should be running (loaded, active and running):
 ```bash
-sudo groupadd docker
-sudo usermod -a -G docker studentx
-newgrp docker
-```
-Now we can install docker and other dependencies for molecule.
-
-```bash
-#sudo yum -y install gcc docker python-devel <- check whether still needed
-sudo systemctl enable --now docker
-sudo systemctl status docker
+sudo systemctl status podman
+● podman.service - Podman API Service
+   Loaded: loaded (/usr/lib/systemd/system/podman.service; static; vendor preset: disabled)
+   Active: active (running) since Wed 2021-01-27 12:15:17 UTC; 1s ago
+     Docs: man:podman-system-service(1)
+ Main PID: 167860 (podman)
+    Tasks: 8 (limit: 23573)
+   Memory: 31.8M
+   CGroup: /system.slice/podman.service
+           └─167860 /usr/bin/podman system service
 ```
 
 ### Step 2 - Molecule
@@ -42,12 +43,11 @@ sudo systemctl status docker
 We use pip inside a virtualenv to install molecule:
 
 ```bash
-sudo dnf -y install openssl-devel libffi-devel python3-virtualenv yamllint
+sudo yum -y install gcc python3-pip python3-devel openssl-devel libselinux-python3 libffi-devel git python3-virtualenv yamllint
 virtualenv --system-site-packages ~/molecule
 . ~/molecule/bin/activate
-pip install --upgrade setuptools pip ansible-lint pytest testinfra
-pip install --force molecule
-pip install molecule[docker]
+pip install --upgrade pip
+pip install molecule molecule[podman] molecule[lint] 
 ```
 
 ```bash
@@ -95,8 +95,10 @@ Commands:
   verify       Run automated tests against instances.
   
 $ molecule --version
-molecule 3.0.4
-   ansible==2.9.9 python==3.6
+molecule 3.2.2 using python 3.6
+    ansible:2.9.16
+    delegated:3.2.2 from molecule
+    podman:0.3.0 from molecule_podman
 ```
 
 ## Section 2: Creating a New Role Framework
@@ -107,9 +109,11 @@ We'll use a simple apache role to test molecule.
 
 ```bash
 cd ~/ansible-files/roles
-molecule init role --driver-name docker apache_install
---> Initializing new role apache_install...
-Initialized role in /home/student1/ansible-files/roles/apache_install successfully.
+molecule init role apache_install --driver-name podman
+INFO     Initializing new role apache_install...
+Using /home/student1/.ansible.cfg as config file
+- Role apache_install was created successfully
+INFO     Initialized role in /home/student1/ansible-files/roles/apache_install successfully.
 ```
 
 Let's have a look at what was created:
@@ -117,47 +121,32 @@ Let's have a look at what was created:
 ```bash
 $ tree
 .
-└── apache_install                            <--- role name as supplied
-    ├── defaults                              <--- default values to variables for the role
-    │   └── main.yml
-    ├── handlers                              <--- specific handlers to notify based on actions
-    │   └── main.yml
-    ├── meta                                  <---  info for the role if you are uploading this to Ansible-Galaxy
-    │   └── main.yml
-    ├── molecule                              <--- molecule specific information 
-    │   └── default
-    │       ├── Dockerfile.j2
-    │       ├── INSTALL.rst
-    │       ├── molecule.yml
-    │       ├── playbook.yml
-    │       └── tests
-    │           ├── test_default.py
-    │           └── test_default.pyc
-    ├── README.md                             <--- information about the role
-    ├── tasks                                 <--- tasks for the role
-    │   └── main.yml
-    └── vars                                  <--- other variables for the role
+└── apache_install
+    ├── defaults
+    │   └── main.yml
+    ├── files
+    ├── handlers
+    │   └── main.yml
+    ├── meta
+    │   └── main.yml
+    ├── molecule
+    │   └── default
+    │       ├── converge.yml
+    │       ├── molecule.yml
+    │       └── verify.yml
+    ├── README.md
+    ├── tasks
+    │   └── main.yml
+    ├── templates
+    ├── tests
+    │   ├── inventory
+    │   └── test.yml
+    └── vars
         └── main.yml
 ```
 
-This command uses ansible-galaxy behind the scenes to generate a new Ansible role. It then injects a molecule directory in the role, and sets it up to run builds and test runs in a docker environment.
+This command uses ansible-galaxy behind the scenes to generate a new Ansible role. It then injects a molecule directory in the role, and sets it up to run builds and test runs in a containerised environment.
 
-The molecule/default directory is probably the most interesting:
-
-#### Dockerfile.j2: 
-This is the Dockerfile used to build the Docker container used as a test environment for your role. It can be changed and customised. The key is this makes sure important dependencies like Python, sudo, and Bash are available inside the build/test environment.
-
-#### INSTALL.rst: 
-Contains instructions for installing required dependencies for running molecule tests.
-
-#### molecule.yml: 
-Tells molecule everything it needs to know about your testing: what OS to use, how to lint your role, how to test your role, etc. 
-
-#### playbook.yml:
-This is the playbook Molecule uses to test your role. For simpler roles, you can usually leave it as-is (it will just run your role and nothing else). But for more complex roles, you might need to do some additional setup, or run other roles prior to running your role.
-
-#### tests/:
-This directory contains a basic Testinfra test, which you can expand on if you want to run additional verification of your build environment state after Ansible's done its thing.
 
 ## Section 3: Testing
 
