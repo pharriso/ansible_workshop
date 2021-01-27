@@ -15,7 +15,7 @@ Note: molecule is an upstream open source project, very liable to change.
 
 SSH into your control node.
 
-### Step 1 - Docker
+### Step 1 - Podman
 
 Now we can install podman and other dependencies for molecule.
 
