@@ -151,7 +151,7 @@ This command uses ansible-galaxy behind the scenes to generate a new Ansible rol
 
 ## Section 3: Testing
 
-### Step 1 - First Tests
+### Step 1 - Molecule Basics
 
 Straight out the box, we should be able to do things:
 
@@ -203,7 +203,7 @@ Hopefully that works, so you now have a test framework to work with.
 
 So what did this do and why is it useful?
 
-The 'create' directive effectively spins up some infra we can use to test our role without doing such else.
+The **_create_** directive effectively spins up some infra we can use to test our role without doing such else.
 
 If we take a look at:
 
@@ -226,7 +226,7 @@ verifier:
 
 This helps us to see what's being used. 
 
-The default in the path referes to a 'scenario', and there is always default out-the-box. There is no need to change that for our basic testing example.
+The default in the path referes to a **scenario**, and there is always *default* out-the-box. There is no need to change that for our basic testing example.
 
 We can see that molecule is going to use the podman driver and for a target platform spin up a container instance using a centos8 image.
 
@@ -242,8 +242,71 @@ CONTAINER ID  IMAGE                          COMMAND               CREATED      
 f07640ca9996  docker.io/pycontribs/centos:8  bash -c while tru...  14 minutes ago  Up 14 minutes ago          instance
 ```
 
-So we have a local centos container image and it's running from the 'molecule create'
+So we have a local centos container image and it's running from the **molecule create**
 
+We can even login to the container:
+
+```bash
+ molecule login
+INFO     Running default > login
+[root@instance /]#
+```
+
+Remember to logout of the container before continuing!
+
+We can use **_destroy_** to teardown that containerised infra:
+
+```bash
+(molecule) [vagrant@sudocve apache_install]$ molecule destroy
+INFO     default scenario test matrix: dependency, cleanup, destroy
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+INFO     Sanity checks: 'podman'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: Wait for instance(s) deletion to complete (300 retries left).
+FAILED - RETRYING: Wait for instance(s) deletion to complete (299 retries left).
+changed: [localhost] => (item={'started': 1, 'finished': 0, 'ansible_job_id': '193165890648.13046', 'results_file': '/home/vagrant/.ansible_async/193165890648.13046', 'changed': True, 'failed': False, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+We can see that the container is no longer there:
+
+```bash
+podman ps
+CONTAINER ID  IMAGE   COMMAND  CREATED  STATUS  PORTS   NAMES
+```
+
+We're using podman for the driver here, but there are lots of other options. We can see what's installed and being used:
+
+```bash
+molecule drivers
+╶──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╴
+  delegated
+  podman
+```
+
+*delegated* can be used with vmware for instance - checkout [this](https://github.com/pharriso/ansible_molecule_vmware) for an example
+
+```bash
+$ molecule list
+INFO     Running default > list
+                ╷             ╷                  ╷               ╷         ╷
+  Instance Name │ Driver Name │ Provisioner Name │ Scenario Name │ Created │ Converged
+╶───────────────┼─────────────┼──────────────────┼───────────────┼─────────┼───────────╴
+  instance      │ podman      │ ansible          │ default       │ false   │ false
+```
 
 ### Step 2 - Further Testing
 
