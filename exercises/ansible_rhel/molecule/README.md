@@ -661,10 +661,48 @@ yamllint .
 ansible-lint .
 ```
 
-Optional: want to see lint picking up an error? Simply add a new blank line to the bottom of *tasks/install_apache.yml* and run *molecule lint* again
+Optional: want to see lint picking up an error? Simply add a new blank line to the bottom of *tasks/install_apache.yml* and run *molecule lint* again. If you do this, please delete the blank line before continuing!
 
 ### Adding Tests
 
+So we've written a role to do something, we might want to test that it works right? We can achieve this by writing simple ansible tasks.
+
+We use *molecule/default/converge.yml* to include the tests we want to do. Let's add an example. Open *converge.yml* and change it to:
+
+```bash
+vi molecule/default/verify.yml
+
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  vars:
+    software: httpd
+
+  tasks:
+  - name: check that things are installed
+    package:
+      name: "{{ software }}"
+      state: present
+    check_mode: yes
+    register: pkg
+
+  - name: fail if package not installed
+    assert:
+      that:
+        - pkg.changed is false
+      fail_msg: "Package {{ software }} was not installed!"
+      success_msg: "Package {{ software }} was installed."
+```
+
+This just simply checks that httpd is installed and we use the useful [assert module](https://docs.ansible.com/ansible/2.9/modules/assert_module.html) to check output status.
+
+Go ahead and do a full test cycle now using:
+
+```bash
+molecule test
+```
 
 ### Further Testing
 
