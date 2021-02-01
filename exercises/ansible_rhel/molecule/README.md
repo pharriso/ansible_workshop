@@ -710,7 +710,7 @@ We now have a fully functional test framework around an Ansible role. What if we
 
 We can add more *platforms* to the *molecule/default/molecule.yml* file to extend the platform we test against.
 
-Let's change *molecule.yml* to test against both Centos and RHEL 8.
+Let's change *molecule.yml* to test against both Centos 7 and 8, but this could be against RHEL, Ubuntu etc.
 
 Change the file so it looks like this:
 
@@ -724,8 +724,8 @@ platforms:
   - name: centos8
     image: docker.io/pycontribs/centos:8
     pre_build_image: true
-  - name: rhel8
-    image: registry.access.redhat.com/ubi8/ubi-init
+  - name: centos7
+    image: docker.io/pycontribs/centos:7
     pre_build_image: true
 provisioner:
   name: ansible
@@ -759,7 +759,7 @@ Just to finish off, try out these subcommands:
 
 **molecule lint**: check the code syntax
 
-**molecule creat**e: create container for the test setup
+**molecule create**: create container for the test setup
 
 **molecule list**: check the container is running
 
