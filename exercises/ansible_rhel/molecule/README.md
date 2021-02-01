@@ -597,7 +597,77 @@ INFO     Pruning extra files from scenario ephemeral directory
 
 Out-the-box molecule gives us something really useful to start with, but we can chop and change what we what to happen.
 
-**_TBC_**
+One of the very useful features is best practice checking with ansible-lint. This can validate things against a *rules* base and pop out suggestions.
+
+
+### Linting
+
+The latest versions of molecule have lint disabled: 
+
+```bash
+molecule lint
+INFO     default scenario test matrix: dependency, lint
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > lint
+INFO     Lint is disabled.
+```
+
+We can enable this feature by adding this to the **bottom** of the *molecule/default/molecule.yml* file:
+
+```bash
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+```
+
+If we run lint now, it'll throw some errors about missing meta data so let's just fix that upfront.
+
+```bash
+vi meta/main.yml
+
+galaxy_info:
+  author: Phil Griffiths
+  description: apache installation role with molecule
+  company: Red Hat
+
+  license: MIT
+
+  min_ansible_version: 2.9
+
+  platforms:
+  - name: rhel
+    versions:
+    - 8
+
+  galaxy_tags: []
+
+dependencies: []
+```
+
+If we run lint now, the output should be clean:
+
+```bash
+molecule lint
+INFO     default scenario test matrix: dependency, lint
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > lint
+COMMAND: set -e
+yamllint .
+ansible-lint .
+```
+
+Optional: want to see lint picking up an error? Simply add a new blank line to the bottom of *tasks/install_apache.yml* and run *molecule lint* again
+
+### Adding Tests
+
+
+### Further Testing
+
 
 ## Summary: The Finished Playbook
 
