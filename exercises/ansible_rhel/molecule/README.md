@@ -737,7 +737,7 @@ lint: |
   ansible-lint .
 ```
 
-Check what it'll do with:
+Check what it does with:
 
 ```bash
 molecule create
@@ -758,12 +758,19 @@ Congratulations! You've explored the basics around using molecule for tesing Ans
 Just to finish off, try out these subcommands:
 
 **molecule lint**: check the code syntax
+
 **molecule creat**e: create container for the test setup
+
 **molecule list**: check the container is running
+
 **molecule converge**: run the tests in the running container
+
 **molecule idempotence**: test idempotence by running the role in loop
+
 **molecule login**: execute shell into test container to inspect it
+
 **molecule destroy**: delete the test container
+
 
 ---
 
