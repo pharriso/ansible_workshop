@@ -706,10 +706,64 @@ molecule test
 
 ### Further Testing
 
+We now have a fully functional test framework around an Ansible role. What if we want to test it out against more than just our Centos 8 instance?
 
-## Summary: The Finished Playbook
+We can add more *platforms* to the *molecule/default/molecule.yml* file to extend the platform we test against.
 
-You've explored the basics around using molecule for tesing Ansible.
+Let's change *molecule.yml* to test against both Centos and RHEL 8.
+
+Change the file so it looks like this:
+
+```bash
+---
+dependency:
+  name: galaxy
+driver:
+  name: podman
+platforms:
+  - name: centos8
+    image: docker.io/pycontribs/centos:8
+    pre_build_image: true
+  - name: rhel8
+    image: registry.access.redhat.com/ubi8/ubi-init
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+```
+
+Check what it'll do with:
+
+```bash
+molecule create
+podman images
+podman ps
+```
+
+Now do a full test again using:
+
+```bash
+molecule test
+```
+
+## Summary:
+
+Congratulations! You've explored the basics around using molecule for tesing Ansible.
+
+Just to finish off, try out these subcommands:
+
+**molecule lint**: check the code syntax
+**molecule creat**e: create container for the test setup
+**molecule list**: check the container is running
+**molecule converge**: run the tests in the running container
+**molecule idempotence**: test idempotence by running the role in loop
+**molecule login**: execute shell into test container to inspect it
+**molecule destroy**: delete the test container
 
 ---
 
