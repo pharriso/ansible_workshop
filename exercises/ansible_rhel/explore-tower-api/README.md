@@ -23,19 +23,20 @@ To explore the API navigate to https://**public_IP**/api/v2/ where **public_IP**
 
 Feel free to click on other links within the API to see all of the objects that are available.
 
-## Review job templates
-
-Everytime we create an object in Tower, it automatically creates the API endpoint to allow us to interact with it. Navigate to **api/v2/job_templates** to see all of the job templates you previosuly created in the Tower UI.
-
-Note the **launch** API which we can use to launch jobs. We'll look at this next.
-
-![job-templates](tower-api-job-templates.png)
+![ping](tower-api-v2-ping.png)
 
 ## Calling the API to check status:
 
 Calling the API ping can be a useful 'health' check. https://**public_IP**/api/v2/ping/
 
-![ping](tower-api-v2-ping.png)
+## Review job templates
+
+Everytime we create an object in Tower, it automatically creates the API endpoint to allow us to interact with it. Navigate to **api/v2/job_templates** to see all of the job templates you previosuly created in the Tower UI.
+
+Note the **launch** API which we can use to launch jobs. We'll look at this in the next exercise.
+
+![job-templates](tower-api-job-templates.png)
+
 
 ---
 
