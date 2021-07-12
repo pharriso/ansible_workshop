@@ -1,62 +1,107 @@
-# Exercise - Call the Tower API - curl example
+# Exercise - Using Tower CLI
 
-## Calling the API to launch a job
+We provide an official CLI tool for interacting with Ansible Tower. As per the [docs](https://docs.ansible.com/ansible-tower/latest/html/towercli/index.html), use cases include:
 
-We can call into Ansible Tower via the API to run a job template for us.
+* Configuring and launching jobs/playbooks
 
-We'll use the "Install Apache" job template that we created earlier.
+* Checking on the status and output of job runs
 
-### Find the Job ID
+* Managing objects like organizations, users, teams, etc…
 
-We need to find the job ID so we can launch it via the api. In the Tower UI go to **Templates** and then click on **Install Apache** job template. In the url you will see the job ID. For example - https://X.X.X.X/#/templates/job_template/8 - This shows my job ID is **8**.
+### Installing Tower CLI
 
-
-### Launch the job
-
-We'll use the *curl* command to launch the job. It's a bit of a handful but let's break it down, so it's easier to understand:
+Let's install Tower CLI on the Ansible control node. As your student user on ansible-1 run the following:
 
 ```bash
--- user:    who we authenticate as. In our case the admin account
--k:         insecure HTTPS. So we don't check for valid certs
--s:         silent mode. Cuts out some of the not so -useful curl output we don't want
--H:         HTTP JSON MIME type headers. We need to POST in the extra_vars and job_tags so the job will run successfully
+sudo dnf config-manager --add-repo https://releases.ansible.com/ansible-tower/cli/ansible-tower-cli-el8.repo
+sudo dnf install ansible-tower-cli -y
 ```
 
-NB. You will need to check and change where necessary the PUBLIC_IP for your Tower instance and the Job Template number (mine here is 8)
+### Configuring Tower CLI
 
-Lastly, we use python to prettify the output, making it more readable.
-
-**NOTE**
-Make sure you update the password below from PASSWORD to your Tower admin password. You also need to update the IP address in the URL to be the public IP address of your Tower server. Finally, you also need to update your job template ID. In the below example we are using job template ID 8 - https://X.X.X.X/api/v2/job_templates/`8`/launch/
-
----
-
+We'll configure Tower CLI by creating a configuration file. As your student user on ansible-1, run the following commands to set the username and password. Replace **PASSWORD** with the admin password.
 
 ```bash
-curl --user 'admin':'PASSWORD' -k -s -H 'Content-Type: application/json' -k -s -XPOST https://X.X.X.X/api/v2/job_templates/8/launch/ | python -m json.tool
+awx-cli config verify_ssl false
+awx-cli config username admin
+awx-cli config password PASSWORD
 ```
 
-You should see some output from the job launch including the ID of this particular job run.
+### Exploring the CLI
+
+First, let's explore all of the options available to the command line tool:
 
 ```bash
-    },
-    "timeout": 0,
-    "type": "job",
-    "unified_job_template": 8,
-    "url": "/api/v2/jobs/`58`/",
-    "use_fact_cache": false,
-    "vault_credential": null,
-    "verbosity": 0
-}
+awx-cli --help
 ```
 
-## Checking The Job
+Next, let's list all of the job templates:
 
-From the above output, I can see that **job 58** was created. We can check this job via the API to see the status. 
+```bash
+awx-cli job_template list
+== ============================================ ========= ======= ==================================================== 
+id                     name                     inventory project                       playbook                       
+== ============================================ ========= ======= ==================================================== 
+10 INFRASTRUCTURE / Turn off IBM Community Grid         2       9 playbooks/infrastructure/turn_off_community_grid.yml
+12 Install Apache                                       2      11 rhel/apache/apache_install.yml
+== ============================================ ========= ======= ====================================================
+```
+
+### Launching a job
+
+Let's launch the **Install Apache** job again.
+
+```bash
+awx-cli job launch -J "Install Apache"
+Resource changed.
+== ============ =========================== ======= ======= 
+id job_template           created           status  elapsed 
+== ============ =========================== ======= ======= 
+ 8           12 2021-07-12T13:49:45.399785Z pending 0.0
+== ============ =========================== ======= =======
+```
+
+You can check the status of the job as follows (replace job ID with the one returned from the previous command):
+
+```bash
+awx-cli job status 8
+```
+
+Once the job shows a status of "successful", let's look at the standard output from the job:
+
+```bash
+awx-cli job stdout 8
+
+PLAY [Apache server installed] *************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [node2]
+ok: [node1]
+ok: [node3]
+
+TASK [latest Apache version installed] *****************************************
+ok: [node1]
+ok: [node3]
+ok: [node2]
+```
+
+### Launching a job and waiting
+
+So far we can see that the CLI makes it very easy to interact with the Tower API. But we are still stringing together multiple commands to launch and then poll jobs. This time we are going to launch the job and wait for the return code:
+
+```bash
+awx-cli job launch -J "Install Apache" --wait
+Resource changed.          
+== ============ =========================== ========== ======= 
+id job_template           created             status   elapsed 
+== ============ =========================== ========== ======= 
+10           12 2021-07-12T13:54:30.805366Z successful 14.714
+== ============ =========================== ========== =======
+```
 
 ## Summary
 
-You can see from this example that it is very easy to consume the Tower API using basic curl commands. The limitation of this approach is that you need to effectively write your own script to perform the interaction with the Tower API and ensure it polls for status etc. We'll look at other ways of consuming the Tower API next.
+Tower CLI makes it very easy to automate the interaction with the Tower API and provides a number of short-cuts when compared with writing your own script.
 
 ---
 
