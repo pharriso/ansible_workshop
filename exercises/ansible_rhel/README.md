@@ -18,6 +18,11 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
  - [Exercise - Exploring the Tower API](tower-api)
  - [Exercise - Using External Vault Integrations: Azure Key Manager and Hashicorp Vault](tower-secret)
 
+## Section 3 - Ansible Tower API
+
+ - [Exercise - Exploring the Tower API](explore-tower-api)
+ - [Exercise - Call the Tower API with curl](curl-tower-api)
+
 ## Additional information
 
  - [Ansible Getting Started](http://docs.ansible.com/ansible/latest/intro_getting_started.html)
