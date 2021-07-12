@@ -29,6 +29,8 @@ Everytime we create an object in Tower, it automatically creates the API endpoin
 
 Note the **launch** API which we can use to launch jobs. We'll look at this next.
 
+![job-templates](tower-api-job-templates.png)
+
 ## Calling the API to check status:
 
 Calling the API ping can be a useful 'health' check. https://**public_IP**/api/v2/ping/
