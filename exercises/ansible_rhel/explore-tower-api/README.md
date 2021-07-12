@@ -1,6 +1,6 @@
 # Exercise - Tower API
 
-Ansible Tower has a RESTFUL API, which we'll explore a little here. Tower allows us to move away from CLI driven automation with Ansible to API driven automation.
+Ansible Tower has a RESTFUL API that allows us to move away from CLI driven automation to API driven automation. This workshop will allow us to explore how we can interact with that API.
 
 ## Why would I want to use the Tower API?
 
@@ -13,9 +13,9 @@ Ansible Tower provides a central platform for executing Ansible playbooks. It so
 * **Credential Management** Being able to safely store credentials and control access to them or integrate with a secret management system like Hashicorp Vault or CyberArk.
 * **Role-Based Access Control** Who can automate? What can they automate against? What credentials are they allowed to use? 
 
-Ansible Tower provides all of these features and integrations out of the box and allows you to consume them in a way that best suits your use-case.
+Ansible Tower provides all of these features and integrations out of the box and allows you to consume them in a way that best suits your use-case via an API.
 
-## Exploe the API
+## Explore the API
 
 To explore the API navigate to https://**public_IP**/api/v2/ where **public_IP** is the public IP of your Tower instance.
 
