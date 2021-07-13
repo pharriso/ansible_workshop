@@ -20,6 +20,8 @@ Finally, click **Clone** and then copy the **Clone with HTTPS** by clicking on t
 
 As your student user, log onto ansible-1 and clone the repo. Don't worry if you see a message saying "You appear to have cloned an empty repository".
 
+**NOTE: Replace the below URL with the one you copied**
+
 ```bash
 cd ~
 git clone https://gitlab.533b.example.opentlc.com/student10/apache.git
