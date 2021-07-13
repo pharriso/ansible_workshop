@@ -24,7 +24,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
  - [Exercise - Call the Tower API with curl](curl-tower-api)
  - [Exercise - Tower CLI](tower-cli-tower-api)
  - [Exercise - Automating Tower with Ansible!](tower-modules-tower-api)
- - [Exercise - Integrating Tower in the CI/CD pipeline](cicd-tower-api)
+ - [Exercise - Integrating Tower as part of your CI/CD pipeline](cicd-tower-api)
 
 ## Additional information
 

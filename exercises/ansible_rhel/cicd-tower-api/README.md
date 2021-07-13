@@ -101,7 +101,7 @@ mkdir ~/apache/tower_config
 
 Now create a playbook that will define a new project with this new gitlab repository, define the job template and finally launch the job. The playbook should be called  ~/apache/tower_config/tower.yml and contain the following:
 
-**NOTE - replace yourgitrepo with the https url you used to clone the gitlab repository**
+**NOTE - update the tower_git_url the https url you used to clone the gitlab repository**
 
 ```bash
 --- 
@@ -112,7 +112,7 @@ Now create a playbook that will define a new project with this new gitlab reposi
   vars:
     tower_project_name: "apache project"
     tower_organization: Default
-    tower_git_url: **yourgitrepo**
+    tower_git_url: changeme!!!!!
     tower_inventory: "Workshop Inventory"
     tower_job_name: "CI Apache Install"
     tower_playbook_name: apache.yml
@@ -167,7 +167,7 @@ export TOWER_USERNAME=admin && export TOWER_PASSWORD=yourpassword && export TOWE
 ansible-playbook tower_config/tower.yml
 ```
 
-Check in the Tower UI to see the objects we have created. The ** CI Apache Install" job should have run succesfully. If it has then push your changes to git.
+Check in the Tower UI to see the objects we have created. The **CI Apache Install** job should have run succesfully. If it has then push your changes to git.
 
 ## Push changes to git
 
@@ -176,6 +176,7 @@ cd ~/apache
 git add .
 git commit -m "Add Tower playbook"
 git push
+```
 
 ## Summary
 
