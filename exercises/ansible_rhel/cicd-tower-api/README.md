@@ -180,10 +180,116 @@ git push
 
 ## Integrate with Gitlab CI/CD
 
-Still to write
+We are going to use Gitlab CI/CD as part of this lab. A Gitlab Runner has already been provisioned. Create a Gitlab CI file called **~/apache/.gitlab-ci.yml** with the following contents:
+
+```bash
+stages:
+  - tower
+
+Configure tower and Execute Job:
+  tags:
+    - ansible
+  stage: tower
+  except: 
+    changes:
+      - .gitlab-ci.yml
+  script:
+    - ansible-playbook tower_config/tower.yml
+```
+
+This is a really basic example which will launch our playbook to configure Ansible Tower and then launch our job. The pipeline will run everytime we make a change except to the .gitlab-ci.yml file.
+
+Push the newly created Gitlab CI file to git:
+
+```bash
+cd ~/apache
+git add .
+git commit -m "Add Gitlab CI file"
+git push
+```
+
+Because we are ignore the Gitlab CI file, we shouldn't see any CI jobs starting.
+
+## Add Tower variables to Gitlab CI
+
+Previously, we have set environment variables from the command line to allow us to authenticate to Ansible Tower. For example we set TOWER_USERNAME and TOWER_PASSWORD. We are going to set these in Gitlab CI now. 
+
+In the Gitlab UI make sure you are in your **apache** repository. In the left-hand menu go to **Settings** and then **CI/CD**.
+
+Expand the **Variables** section and add the following variables by clicking **Add Variable**. 
+
+**NOTE: Your Tower Password and Tower Hostname are available in your workbench information**
+
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>TOWER_USERNAME</td>
+    <td>admin</td>
+  </tr>
+  <tr>
+    <td>TOWER_PASSWORD</td>
+    <td>yourpassword</td>
+  </tr>
+  <tr>
+    <td>TOWER_HOST</td>
+    <td>yourtowerhostname</td>
+  </tr>
+  <tr>
+    <td>TOWER_VERIFY_SSL</td>
+    <td>false</td>
+  </tr>
+</table>
+
+You should see something similar to this when you are finished:
+
+
+![gitlab-ci-variables](gitlab-ci-variables.png)
+
+
+## Testing our CI configuration
+
+We should have everything in place now. Let's edit our web.html file and see if our CI pipeline automatically deploys our changes via Ansible Tower.
+
+Edit **~/apache/files/web.html** and update your message to something like this:
+
+```bash
+<body>
+<h1>Deployed with Gitlab CI</h1>
+</body>
+```
+
+Commit the changes and push them to git:
+
+
+```bash
+cd ~/apache
+git add .
+git commit -m "Updating my website"
+git push
+```
+
+In the Gitlab UI make sure you are in your **apache** repository. In the left-hand menu, select **CI/CD** and then **Pipelines**.
+
+![gitlab-pipeline-status](gitlab-pipeline-status.png)
+
+You can click on the **Passed** button to view the details for the job.
+
+![gitlab-pipeline-detail](gitlab-pipeline-detail.png)
+
+Next, we can login to the Ansible Tower UI to verify that the project was updated and that the job ran succesfully. In the left-hand menu in Ansible Tower select **Jobs**.
+
+![tower-job-status](tower-job-status.png)
+
+Finally, browse to one of your webservers to make sure you see your new index.html. Reminder that you can find the IP of your web servers by looking in the inventory in Ansible Tower - **Inventories** -> **Workshop Inventory** -> **Hosts** and then click on one of the nodes to see the IP address.
 
 ## Summary
 
+In this lab we have leveraged the Ansible modules for Ansible Tower to configure more objects. Using this approach you can fully configure and deploy Ansible Tower in a completely automated way using the Ansible language.
+
+We have also taken what we have learned in previous labs to integrate Ansible Tower with our CI/CD pipeline. This allows us to consume the Ansible Tower API to deploy our infrastructure with all of the relevant auditing and controls in place without having to re-invent the wheel.
 
 ---
 
