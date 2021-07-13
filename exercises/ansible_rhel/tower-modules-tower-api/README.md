@@ -72,7 +72,11 @@ Now let's launch our job:
 
 ```bash
 ansible-playbook tower_job_launch.yml 
+```
 
+The output should look like this:
+
+```bash
 PLAY [launch a tower job] ********************************************************************************************************************************************************************
 
 TASK [launch Install Apache job] *************************************************************************************************************************************************************
@@ -89,7 +93,7 @@ You can check in the Tower UI to validate if your job ran successfully.
 
 ## Summary
 
-We have now looked at four different ways of interacting with Ansible Tower todo the same thing - launch a job. The UI, directly with the API, Tower CLI and finally the Ansible Tower modules. This gives users the flexibility to consume the Ansible Automation Platform in the way that best suits their use-case. In the next lab we are going to look at a more complete example and how we can configure larger parts of Ansible Tower with the Ansible modules.
+We have now looked at four different ways of interacting with Ansible Tower to do the same thing - launch a job. The UI, directly with the API, Tower CLI and finally the Ansible Tower modules. This gives users the flexibility to consume the Ansible Automation Platform in the way that best suits their use-case. In the next lab we are going to look at a more complete example and how we can configure larger parts of Ansible Tower with the Ansible modules.
 
 ---
 
