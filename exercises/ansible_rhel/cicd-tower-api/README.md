@@ -18,18 +18,11 @@ Finally, click **Clone** and then copy the **Clone with HTTPS** by clicking on t
 
 ## Creating our playbook
 
-As your student user, log onto ansible-1 and clone the repo
+As your student user, log onto ansible-1 and clone the repo. Don't worry if you see a message saying "You appear to have cloned an empty repository".
 
 ```bash
 cd ~
 git clone https://gitlab.533b.example.opentlc.com/student10/apache.git
-```
-
-Output:
-
-```bash
-Cloning into 'apache'...
-warning: You appear to have cloned an empty repository.
 ```
 
 We are going to re-create the Install Apache playbook and push this to our git repo. Change directory to the newly cloned apache directory.
@@ -213,7 +206,7 @@ git commit -m "Add Gitlab CI file"
 git push
 ```
 
-Because we are ignore the Gitlab CI file, we shouldn't see any CI jobs starting.
+Because we are ignoring the Gitlab CI file, we shouldn't see any CI jobs starting.
 
 ## Add Tower variables to Gitlab CI
 
