@@ -178,9 +178,12 @@ git commit -m "Add Tower playbook"
 git push
 ```
 
+## Integrate with Gitlab CI/CD
+
+Still to write
+
 ## Summary
 
-We have now looked at four different ways of interacting with Ansible Tower todo the same thing - launch a job. The UI, directly with the API, Tower CLI and finally the Ansible Tower modules. This gives users the flexibility to consume the Ansible Automation Platform in the way that best suits their use-case. In the next lab we are going to look at a more complete example and how we can configure larger parts of Ansible Tower with the Ansible modules.
 
 ---
 
