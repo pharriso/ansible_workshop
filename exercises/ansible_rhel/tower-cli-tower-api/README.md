@@ -17,14 +17,12 @@ sudo dnf config-manager --add-repo https://releases.ansible.com/ansible-tower/cl
 sudo dnf install ansible-tower-cli -y
 ```
 
-### Configuring Tower CLI
+### Authentication with Tower CLI
 
-We'll configure Tower CLI by creating a configuration file. As your student user on ansible-1, run the following commands to set the username and password. Replace **PASSWORD** with the admin password.
+There are different ways of configuring authentication for Tower CLI. We will eventually be running our Tower configuration as part of a CI/CD pipeline so we'll use environment variables to set our authentication. As your student user on ansible-1, run the following commands to set the username and password. Replace **yourpassword** with the admin password.
 
 ```bash
-awx-cli config verify_ssl false
-awx-cli config username admin
-awx-cli config password PASSWORD
+export TOWER_USERNAME=admin && export TOWER_PASSWORD=yourpassword && export TOWER_VERIFY_SSL=false
 ```
 
 ### Exploring the CLI

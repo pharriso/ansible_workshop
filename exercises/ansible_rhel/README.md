@@ -23,6 +23,7 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
  - [Exercise - Exploring the Tower API](explore-tower-api)
  - [Exercise - Call the Tower API with curl](curl-tower-api)
  - [Exercise - Tower CLI](tower-cli-tower-api)
+ - [Exercise - Automating Tower with Ansible!](tower-modules-tower-api)
 
 ## Additional information
 
