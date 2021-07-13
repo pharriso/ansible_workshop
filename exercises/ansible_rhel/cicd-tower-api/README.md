@@ -2,9 +2,9 @@
 
 We are going to use our Install Apache example again but integrate it with our CI/CD pipeline to automatically deploy our website.
 
-## Create gitlab repository
+## Create a gitlab repository
 
-Select **Create Project**
+Select **Create a Project**
 
 ![gitlab-create-project](gitlab-create-project.png)
 
@@ -12,7 +12,7 @@ Name the project **apache** and make sure the repository is set to **public**
 
 ![gitlab-create-project-details](gitlab-create-project-details.png)
 
-Finally, click **clone** and then copy the **Clone with HTTPS** by clicking on the clipboard icon next to **Clone with HTTPS**.
+Finally, click **Clone** and then copy the **Clone with HTTPS** by clicking on the clipboard icon next to **Clone with HTTPS**.
 
 ![gitlab-clone-repo-link](gitlab-clone-repo-link.png)
 
@@ -23,6 +23,11 @@ As your student user, log onto ansible-1 and clone the repo
 ```bash
 cd ~
 git clone https://gitlab.533b.example.opentlc.com/student10/apache.git
+```
+
+Output:
+
+```bash
 Cloning into 'apache'...
 warning: You appear to have cloned an empty repository.
 ```
@@ -91,7 +96,7 @@ If you check the gitlab repository in your web browser, you should now see your 
 
 ![gitlab-push](gitlab-push.png)
 
-## Create playbook to configure Ansible Tower
+## Create a playbook to configure Ansible Tower
 
 Now that we have our playbook, we are going to write a second playbook that will create the necessary objects in Ansible Tower to allow us to execute our job. As the student user on the ansible-1 create a directory for the Tower configuration:
 
