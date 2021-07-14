@@ -15,7 +15,6 @@ Link to the core [Exercises](https://ansible.github.io/workshops/exercises/ansib
 ## Section 2 - Ansible Tower Exercises
 
  - [Exercise - Configuration Management: config drift logged with ServiceNow](configmgmt)
- - [Exercise - Exploring the Tower API](tower-api)
  - [Exercise - Using External Vault Integrations: Azure Key Manager and Hashicorp Vault](tower-secret)
 
 ## Section 3 - Ansible Tower API
