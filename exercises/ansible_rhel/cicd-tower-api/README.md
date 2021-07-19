@@ -160,7 +160,7 @@ Now create a playbook that will define a new project with this new gitlab reposi
 Make sure you still have your Tower environment variables set so we can authenticate to the Tower API (replace **yourpassword** with the correct password):
 
 ```bash
-export TOWER_USERNAME=admin && export TOWER_PASSWORD=yourpassword && export TOWER_VERIFY_SSL=false
+export TOWER_USERNAME=admin && export TOWER_VERIFY_SSL=false && export TOWER_PASSWORD=yourpassword
 ```
 
 ```bash

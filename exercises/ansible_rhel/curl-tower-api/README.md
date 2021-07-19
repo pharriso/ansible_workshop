@@ -20,9 +20,6 @@ We'll use the *curl* command to launch the job. It's a bit of a handful but let'
 -s:         silent mode. Cuts out some of the not so -useful curl output we don't want
 -H:         HTTP JSON MIME type headers. We need to POST in the extra_vars and job_tags so the job will run successfully
 ```
-
-NB. You will need to check and change where necessary the PUBLIC_IP for your Tower instance and the Job Template number (mine here is 8)
-
 Lastly, we use python to prettify the output, making it more readable.
 
 **NOTE**
@@ -32,7 +29,7 @@ Make sure you update the password below from PASSWORD to your Tower admin passwo
 
 
 ```bash
-curl --user 'admin':'PASSWORD' -k -s -H 'Content-Type: application/json' -k -s -XPOST https://X.X.X.X/api/v2/job_templates/8/launch/ | python -m json.tool
+curl --user 'admin':'PASSWORD' -k -s -H 'Content-Type: application/json' -k -s -XPOST https://X.X.X.X/api/v2/job_templates/8/launch/ | /bin/python3 -m json.tool
 ```
 
 You should see some output from the job launch including the ID of this particular job run.
@@ -54,7 +51,7 @@ You should see some output from the job launch including the ID of this particul
 From the above output, I can see that **job 58** was created and we can see the **url** to view the status.
 
 ```bash
-curl --user 'admin':'PASSWORD' -k -s -H 'Content-Type: application/json' -k -s -XGET https://X.X.X.X/api/v2/jobs/58/ | python -m json.tool
+curl --user 'admin':'PASSWORD' -k -s -H 'Content-Type: application/json' -k -s -XGET https://X.X.X.X/api/v2/jobs/58/ | /bin/python3 -m json.tool
 ```
 
 A lot of output will be returned. This includes the status of the job:

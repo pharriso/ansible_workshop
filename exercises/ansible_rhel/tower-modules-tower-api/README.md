@@ -27,7 +27,7 @@ ansible-doc awx.awx.tower_organization
 There are different ways of configuring authentication for the Tower modules. We will eventually be running our Tower configuration as part of a CI/CD pipeline so we'll use environment variables to set our authentication. As your student user on ansible-1, run the following commands to set the username and password. Replace **yourpassword** with the admin password.
 
 ```bash
-export TOWER_USERNAME=admin && export TOWER_PASSWORD=yourpassword && export TOWER_VERIFY_SSL=false
+export TOWER_USERNAME=admin && export TOWER_VERIFY_SSL=false && export TOWER_PASSWORD=yourpassword
 ```
 
 ### Writing our first playbook to automate Tower
@@ -65,7 +65,7 @@ Create a new file called **tower_job_launch.yml** using your favourite editor an
 Make sure your environment variables are still set to allow us to authenticate to Tower. If you are unsure then run the following again (make sure you replace **yourpassword**):
 
 ```bash
-export TOWER_USERNAME=admin && export TOWER_PASSWORD=yourpassword && export TOWER_VERIFY_SSL=false
+export TOWER_USERNAME=admin && export TOWER_VERIFY_SSL=false && export TOWER_PASSWORD=yourpassword
 ```
 
 Now let's launch our job:

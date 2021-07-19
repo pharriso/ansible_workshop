@@ -19,8 +19,6 @@ Ansible Tower provides all of these features and integrations out of the box and
 
 To explore the API navigate to https://**public_IP**/api/v2/ where **public_IP** is the public IP of your Tower instance.
 
-![apiv2](tower-api-v2.png)
-
 Feel free to click on other links within the API to see all of the objects that are available.
 
 ![ping](tower-api-v2-ping.png)
@@ -28,6 +26,8 @@ Feel free to click on other links within the API to see all of the objects that 
 ## Calling the API to check status:
 
 Calling the API ping can be a useful 'health' check. https://**public_IP**/api/v2/ping/
+
+![apiv2](tower-api-v2.png)
 
 ## Review job templates
 

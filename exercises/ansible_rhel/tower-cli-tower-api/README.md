@@ -22,7 +22,7 @@ sudo dnf install ansible-tower-cli -y
 There are different ways of configuring authentication for Tower CLI. We will eventually be running our Tower configuration as part of a CI/CD pipeline so we'll use environment variables to set our authentication. As your student user on ansible-1, run the following commands to set the username and password. Replace **yourpassword** with the admin password.
 
 ```bash
-export TOWER_USERNAME=admin && export TOWER_PASSWORD=yourpassword && export TOWER_VERIFY_SSL=false
+export TOWER_USERNAME=admin && export TOWER_VERIFY_SSL=false && export TOWER_PASSWORD=yourpassword
 ```
 
 ### Exploring the CLI
