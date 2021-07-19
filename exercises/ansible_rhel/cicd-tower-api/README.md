@@ -4,6 +4,8 @@ We are going to use our Install Apache example again but integrate it with our C
 
 ## Create a gitlab repository
 
+Log into gitlab using your student user and password. Your instructor will provide the URL for the gitlab instance.
+
 Select **Create a Project**
 
 ![gitlab-create-project](gitlab-create-project.png)
@@ -23,7 +25,7 @@ As your student user, log onto ansible-1 and clone the repo. Don't worry if you 
 **NOTE: Replace the below URL with the one you copied**
 
 ```bash
-cd ~
+cd
 git clone https://gitlab.533b.example.opentlc.com/student10/apache.git
 ```
 
@@ -33,7 +35,7 @@ We are going to re-create the Install Apache playbook and push this to our git r
 cd ~/apache
 ```
 
-Create the playbook ~/apache/apache.yml with the following contents:
+Create the playbook **~/apache/apache.yml** with the following contents:
 
 ```bash
 ---
@@ -56,13 +58,15 @@ Create the playbook ~/apache/apache.yml with the following contents:
       dest: /var/www/html/index.html
 ```
 
+**NOTE - check indentation if you copy and paste**
+
 Next create a directory for the index.html:
 
 ```bash
 mkdir ~/apache/files
 ```
 
-Finally, create ~/apache/files/web.html 
+Finally, create **~/apache/files/web.html** 
 
 ```bash
 <body>
@@ -87,6 +91,8 @@ git commit -m "initial commit"
 git push
 ```
 
+You'll be prompted for a username and password. Use your student ID and password.
+
 If you check the gitlab repository in your web browser, you should now see your files.
 
 ![gitlab-push](gitlab-push.png)
@@ -99,7 +105,7 @@ Now that we have our playbook, we are going to write a second playbook that will
 mkdir ~/apache/tower_config
 ```
 
-Now create a playbook that will define a new project with this new gitlab repository, define the job template and finally launch the job. The playbook should be called  ~/apache/tower_config/tower.yml and contain the following:
+Now create a playbook that will define a new project with this new gitlab repository, define the job template and finally launch the job. The playbook should be called  **~/apache/tower_config/tower.yml** and contain the following:
 
 **NOTE - update the tower_git_url the https url you used to clone the gitlab repository**
 
@@ -284,6 +290,15 @@ Next, we can login to the Ansible Tower UI to verify that the project was update
 ![tower-job-status](tower-job-status.png)
 
 Finally, browse to one of your webservers to make sure you see your new index.html. Reminder that you can find the IP of your web servers by looking in the inventory in Ansible Tower - **Inventories** -> **Workshop Inventory** -> **Hosts** and then click on one of the nodes to see the IP address.
+
+## So what just happened?
+
+We just pushed changes to our "code" in our gitlab repository. Our CI/CD pipeline detected the change and interacted with Ansible Tower to:
+
+* Synchronise Tower and our Gitlab repository to bring changes into Ansible Tower.
+
+* Execute our job to deploy the changes.
+
 
 ## Summary
 

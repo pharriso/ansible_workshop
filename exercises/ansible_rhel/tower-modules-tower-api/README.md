@@ -8,6 +8,8 @@ As with everything at Red Hat, we provide an upstream community collection calle
 
 We are going to install the awx.awx collection because the lab environment doesn't provide access to the certified content in [Automation Hub](https://www.ansible.com/products/automation-hub). 
 
+As the student user on ansible-1 run the following:
+
 ```bash
 ansible-galaxy collection install awx.awx:19.1.0
 ```
