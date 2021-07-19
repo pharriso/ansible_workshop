@@ -29,6 +29,13 @@ cd
 git clone https://gitlab.533b.example.opentlc.com/student10/apache.git
 ```
 
+Let's configure our git client. We need to do this before we can push changes
+
+```bash
+git config --global user.email "$(logname)@workshop"
+git config --global user.name "$(logname)"
+```
+
 We are going to re-create the Install Apache playbook and push this to our git repo. Change directory to the newly cloned apache directory.
 
 ```bash
