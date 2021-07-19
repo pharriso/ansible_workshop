@@ -37,6 +37,11 @@ Next, let's list all of the job templates:
 
 ```bash
 awx-cli job_template list
+```
+
+The output should look something like this
+
+```bash
 == ============================================ ========= ======= ==================================================== 
 id                     name                     inventory project                       playbook                       
 == ============================================ ========= ======= ==================================================== 
@@ -51,12 +56,6 @@ Let's launch the **Install Apache** job again.
 
 ```bash
 awx-cli job launch -J "Install Apache"
-Resource changed.
-== ============ =========================== ======= ======= 
-id job_template           created           status  elapsed 
-== ============ =========================== ======= ======= 
- 8           12 2021-07-12T13:49:45.399785Z pending 0.0
-== ============ =========================== ======= =======
 ```
 
 You can check the status of the job as follows (replace job ID with the one returned from the previous command):
@@ -69,7 +68,11 @@ Once the job shows a status of "successful", let's look at the standard output f
 
 ```bash
 awx-cli job stdout 8
+```
 
+You should see the familiar Ansible job output
+
+```bash
 PLAY [Apache server installed] *************************************************
 
 TASK [Gathering Facts] *********************************************************
@@ -89,6 +92,11 @@ So far we can see that the CLI makes it very easy to interact with the Tower API
 
 ```bash
 awx-cli job launch -J "Install Apache" --wait
+```
+
+You should see something like this 
+
+```bash
 Resource changed.          
 == ============ =========================== ========== ======= 
 id job_template           created             status   elapsed 
