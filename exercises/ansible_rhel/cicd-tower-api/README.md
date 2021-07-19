@@ -306,6 +306,7 @@ We just pushed changes to our "code" in our gitlab repository. Our CI/CD pipelin
 
 * Execute our job to deploy the changes.
 
+This has allowed us to offload responsibility for executing the change to the Ansible Automation Platform while allowing us to define the deployment as code in our git repository.
 
 ## Summary
 
